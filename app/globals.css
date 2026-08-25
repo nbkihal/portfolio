@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
+
+    --primary: 258 90% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 10%;
+
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 40%;
+
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 6% 10%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 258 90% 58%;
+
+    /* Bold brand accent + contrast secondary */
+    --brand: 258 90% 58%;
+    --brand-foreground: 0 0% 100%;
+    --cyan: 190 95% 42%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 258 24% 5%;
+    --foreground: 0 0% 98%;
+
+    --card: 258 18% 7%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 258 20% 6%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 258 90% 66%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 258 15% 14%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 258 12% 15%;
+    --muted-foreground: 250 8% 65%;
+
+    --accent: 258 15% 16%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 258 15% 16%;
+    --input: 258 15% 18%;
+    --ring: 258 90% 66%;
+
+    --brand: 258 90% 66%;
+    --brand-foreground: 0 0% 100%;
+    --cyan: 187 92% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Offset anchor scroll so section headings clear the fixed navbar. */
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  ::selection {
+    @apply bg-brand/30 text-foreground;
+  }
+
+  /* Respect users who prefer less motion. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer utilities {
+  /* Reusable gradient text for headlines. */
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand via-brand to-cyan bg-clip-text text-transparent;
+  }
+
+  /* Faint dotted grid used behind sections. */
+  .bg-dotted {
+    background-image: radial-gradient(
+      hsl(var(--border)) 1px,
+      transparent 1px
+    );
+    background-size: 24px 24px;
+  }
+
+  .glow-brand {
+    box-shadow: 0 0 40px -10px hsl(var(--brand) / 0.5);
+  }
+}
