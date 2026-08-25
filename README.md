@@ -1,158 +1,51 @@
+<div align="center">
+
 # Ayoub — Portfolio
 
-A bold, creative freelance-developer portfolio built to attract clients. Full-viewport interactive 3D globe hero, bento-grid case studies, and a fully data-driven content layer.
+**Freelance developer building fast, AI-powered web experiences.**
 
-**Stack:** Next.js 15 (App Router) · TypeScript · Tailwind CSS · Framer Motion · react-three-fiber + drei · next-themes · Lucide · deployed on Vercel.
+[Live Site](#) · [Contact](#lets-work-together) · [LinkedIn](https://linkedin.com/in/kihal-ayoub-219b39298)
 
----
-
-## Quick start
-
-```bash
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-Other scripts:
-
-```bash
-npm run build   # production build
-npm run start   # serve the production build
-npm run lint    # eslint
-```
-
-> Requires Node 18.18+ (Node 20+ recommended).
+</div>
 
 ---
 
-## Before you launch — 2 placeholders to replace
+## About
 
-Both live in **`content/site-data.ts`**:
+I'm Ayoub — a software engineering student at ESI (École Supérieure d'Informatique) Algiers, and a freelance developer who ships real products. This repo is the source for my portfolio site: a bold, interactive showcase of full-stack builds, AI-integrated tools, and collaborative projects.
 
-1. **Your email** — search for `your-email@example.com` (appears in `contact.email` and the Email social link) and replace with your real address.
-2. **The contact form endpoint** — see [Wiring up the contact form](#wiring-up-the-contact-form) below.
+## Highlights
 
-Until the Formspree endpoint is set, the contact form **falls back to opening the visitor's email client** (a `mailto:` to your address) instead of failing silently — so nothing breaks, it's just not a true no-backend form yet.
+- 🌍 **Interactive 3D globe hero** — built with Three.js / react-three-fiber, mouse-reactive
+- ⚡ **Fast by default** — Next.js App Router, optimized images, code-split 3D scene
+- 🎨 **Bold, distinctive design** — not another template-looking dev portfolio
+- 🧩 **Fully responsive** — mobile-first, tested down to 375px
 
----
+## Featured Work
 
-## Editing content
+| Project | Description | Stack |
+|---|---|---|
+| [Traveleo](https://github.com/Dali-MDB/Traveleo) | Full-stack travel agency platform | Django · Python · JS · Docker |
+| [Refactoring Swarm](https://github.com/Erraid7/Refactoring-Swarm-Equipe-24) | Multi-agent AI system that autonomously refactors Python code | Python · LangChain · Gemini API |
+| AI-Powered CV Generator | Commercial AI product for the French/Algerian market | Anthropic API · HTML/CSS/JS |
+| Interactive 3D Earth Globe | Real-textured, touch/zoom-enabled 3D globe | Three.js · WebGL |
 
-**All copy, projects, services, and links live in one file: [`content/site-data.ts`](content/site-data.ts).** Components never hardcode text — they read from these typed exports. You should never need to touch a component to change wording.
+More case studies live on the site itself.
 
-| Want to change...        | Edit this export       |
-| ------------------------ | ---------------------- |
-| Name, headline, CTAs     | `hero`                 |
-| Bio + highlight chips    | `about`                |
-| The 4 service cards      | `services`             |
-| Projects / case studies  | `projects`             |
-| CSE leadership block     | `involvement`          |
-| Testimonials             | `testimonials`         |
-| Email, socials, form     | `contact`              |
-| Nav menu items           | `navLinks`             |
-| `<title>` / SEO meta     | `site`                 |
+## Tech Stack
 
-### Adding a project
+Next.js · TypeScript · Tailwind CSS · Framer Motion · react-three-fiber · shadcn/ui
 
-Push a new object onto the `projects` array. Each project drives both the card and its expandable case-study modal:
+## Let's Work Together
 
-```ts
-{
-  id: "my-project",
-  title: "My Project — Short Tagline",
-  description: "One-line summary shown on the card.",
-  tech: ["Next.js", "TypeScript"],
-  githubUrl: "https://github.com/you/repo", // optional
-  liveUrl: "https://example.com",           // optional
-  size: "md",                                // "lg" = wide feature card, "md" = normal
-  caseStudy: {
-    problem: "What needed solving.",
-    build: "What you built and how.",
-    outcome: "The result.",
-  },
-},
-```
+I take on full-stack builds, AI-integrated products, landing pages, and automation work.
 
-Card order = display order (arrange by visual impact). Mark one card `size: "lg"` to anchor the bento grid.
-
-### Adding testimonials
-
-The Testimonials section is **data-driven and starts empty** — it renders a subtle "coming soon" state and **never shows fabricated quotes**. When you have a real quote, add an entry to the `testimonials` array in `content/site-data.ts`:
-
-```ts
-export const testimonials: Testimonial[] = [
-  {
-    quote: "Ayoub delivered exactly what we needed, ahead of schedule.",
-    name: "Full Name",
-    role: "Role, Company",
-  },
-];
-```
-
-The section automatically switches from the placeholder to a card grid as soon as the array has entries. Good people to ask: the RAHBARAAN contact, or Traveleo teammates who can speak to your role.
+📧 **Email:** nb_kihal@esi.dz
+💼 **LinkedIn:** [linkedin.com/in/kihal-ayoub-219b39298](https://linkedin.com/in/kihal-ayoub-219b39298)
+🐙 **GitHub:** [github.com/nbkihal](https://github.com/nbkihal)
 
 ---
 
-## Wiring up the contact form
-
-The form uses [Formspree](https://formspree.io) — no backend required.
-
-1. Create a free Formspree account and a new form.
-2. Copy your form endpoint — it looks like `https://formspree.io/f/abcdwxyz`.
-3. In `content/site-data.ts`, set `contact.formspreeEndpoint` to that URL.
-
-That's it. Submissions now POST to Formspree and the form shows inline success/error states. (Formspree emails you each submission and handles spam filtering.)
-
----
-
-## Theming & design tokens
-
-- **Dark mode is the default**, with a light theme and a toggle (via `next-themes`).
-- Colors are CSS variables defined in [`app/globals.css`](app/globals.css) (`:root` for light, `.dark` for dark) and mapped to Tailwind in [`tailwind.config.ts`](tailwind.config.ts).
-- The **accent color is electric violet** (`--brand`) with a **cyan** secondary. To rebrand, change the `--brand` / `--cyan` HSL values in `app/globals.css` — everything (buttons, globe glow, highlights) follows. The 3D globe's colors are set near the top of [`components/globe-canvas.tsx`](components/globe-canvas.tsx) (`BRAND` / `CYAN` constants) — update those to match.
-- Fonts: **Space Grotesk** (display/headings) + **Inter** (body), loaded via `next/font` in [`app/layout.tsx`](app/layout.tsx).
-
----
-
-## The 3D globe
-
-- Lives in [`components/globe-canvas.tsx`](components/globe-canvas.tsx) (the react-three-fiber scene) and [`components/hero-globe.tsx`](components/hero-globe.tsx) (the loader/wrapper).
-- **Code-split** (`next/dynamic`, `ssr: false`) so it never blocks first paint or runs on the server.
-- **Paused when off-screen** via `IntersectionObserver` (the render loop stops once the hero scrolls away) to save CPU/GPU/battery.
-- **Respects `prefers-reduced-motion`** (auto-rotation stops) and is wrapped in an **error boundary** so a WebGL failure degrades gracefully instead of crashing the page.
-
----
-
-## Project structure
-
-```
-app/
-  layout.tsx          # fonts, metadata, theme provider, navbar + footer
-  page.tsx            # section composition (order lives here)
-  globals.css         # design tokens (light/dark) + base styles
-components/
-  sections/           # one component per page section
-    hero, about, services, projects, involvement, testimonials, contact
-  ui/                 # shadcn-style primitives (button, card, badge, input…)
-  globe-canvas.tsx    # the react-three-fiber 3D scene
-  hero-globe.tsx      # dynamic import + visibility gating + error boundary
-  navbar.tsx, footer.tsx, theme-*.tsx, reveal.tsx, section.tsx, contact-form.tsx
-content/
-  site-data.ts        # ← ALL content lives here
-lib/
-  utils.ts            # cn() class merger
-  icons.ts            # IconKey → Lucide component registry
-```
-
----
-
-## Deploying to Vercel
-
-1. Push this repo to GitHub (`git init && git add . && git commit && git push`).
-2. Go to [vercel.com/new](https://vercel.com/new) and import the repository.
-3. Vercel auto-detects Next.js — no configuration needed. Click **Deploy**.
-4. (Optional) Add your custom domain in the project's **Domains** settings, then update `site.url` in `content/site-data.ts` so SEO/OG metadata points at the real domain.
-
-Every push to the default branch redeploys automatically.
+<div align="center">
+<sub>Built by Ayoub — 2026</sub>
+</div>
