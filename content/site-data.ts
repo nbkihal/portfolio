@@ -97,8 +97,10 @@ export const navLinks: NavLink[] = [
 /* -------------------------------------------------------------------- hero */
 
 export const hero = {
-  /** Full name — rendered as the main hero title. */
+  /** Full name — rendered as the main hero title (highlighted). */
   name: "Kihal Ayoub",
+  /** Opening words shown before the name in the big hero title. */
+  greeting: "Hi, I'm",
   /** Short role line shown in the availability badge. */
   role: "Full-Stack & AI Developer",
   /**
@@ -114,11 +116,8 @@ export const hero = {
     "Software engineering student at ESI Algiers and freelance developer. From idea to production — fast.",
   primaryCta: { label: "Start a Project", href: "#contact" } satisfies CTA,
   secondaryCta: { label: "See My Work", href: "#projects" } satisfies CTA,
-  /**
-   * Drop a square-ish photo at public/kihal-ayoub.jpg (or change this path).
-   * Until that file exists, the hero shows a styled placeholder frame.
-   */
-  photoSrc: "/kihal-ayoub.jpg",
+  /** Square portrait served from /public. */
+  photoSrc: "/kihal-ayoub.png",
   photoAlt: "Kihal Ayoub",
 };
 
