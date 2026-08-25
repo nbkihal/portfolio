@@ -13,7 +13,6 @@ export function Hero() {
       id="top"
       className="relative flex min-h-[100svh] items-center overflow-hidden"
     >
-      <HeroGlobe />
 
       <div className="container relative py-28">
         <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
@@ -65,7 +64,7 @@ export function Hero() {
                 aria-hidden="true"
                 className="absolute -inset-4 -z-10 rounded-[2rem] bg-brand/20 blur-2xl"
               />
-              <div className="relative h-full w-full overflow-hidden rounded-3xl border border-border bg-card shadow-2xl glow-brand">
+              <div className="relative h-full w-full overflow-hidden rounded-full border border-border bg-card shadow-2xl glow-brand">
                 <Image
                   src={hero.photoSrc}
                   alt={hero.photoAlt}
