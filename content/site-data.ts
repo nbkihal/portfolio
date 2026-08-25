@@ -75,9 +75,9 @@ export interface SocialLink {
 /* ------------------------------------------------------------------- site */
 
 export const site = {
-  name: "Ayoub",
+  name: "Kihal Ayoub",
   /** Used in <title> and social meta. */
-  title: "Ayoub — Freelance Full-Stack & AI Developer",
+  title: "Kihal Ayoub — Freelance Full-Stack & AI Developer",
   description:
     "Freelance software engineer building fast, AI-powered web experiences — from idea to production. Full-stack platforms, LLM-integrated products, and bold landing pages.",
   /** Update to your deployed domain (used for canonical + OG URLs). */
@@ -91,19 +91,35 @@ export const navLinks: NavLink[] = [
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
   { label: "Work", href: "#projects" },
-  { label: "Involvement", href: "#involvement" },
   { label: "Contact", href: "#contact" },
 ];
 
 /* -------------------------------------------------------------------- hero */
 
 export const hero = {
-  name: "Ayoub",
-  headline: "I build fast, AI-powered web experiences — from idea to production.",
+  /** Full name — rendered as the main hero title. */
+  name: "Kihal Ayoub",
+  /** Short role line shown in the availability badge. */
+  role: "Full-Stack & AI Developer",
+  /**
+   * The "hook" — short lines shown one at a time with a typewriter animation
+   * under the name. Keep each punchy; they cycle on a loop.
+   */
+  taglines: [
+    "I turn ambitious ideas into products that actually ship.",
+    "Full-stack platforms, AI-integrated tools, and interfaces that don't look like everyone else's.",
+    "I make ideas boot — on the first try. Usually.",
+  ],
   subheadline:
-    "4th-year Software Engineering student at ESI Algiers. Freelance developer. I turn ambitious ideas into shipped products.",
+    "Software engineering student at ESI Algiers and freelance developer. From idea to production — fast.",
   primaryCta: { label: "Start a Project", href: "#contact" } satisfies CTA,
   secondaryCta: { label: "See My Work", href: "#projects" } satisfies CTA,
+  /**
+   * Drop a square-ish photo at public/kihal-ayoub.jpg (or change this path).
+   * Until that file exists, the hero shows a styled placeholder frame.
+   */
+  photoSrc: "/kihal-ayoub.jpg",
+  photoAlt: "Kihal Ayoub",
 };
 
 /* ------------------------------------------------------------------- about */
@@ -111,14 +127,14 @@ export const hero = {
 export const about = {
   heading: "About",
   paragraphs: [
-    "I'm Ayoub — a software engineering student at ESI (École Supérieure d'Informatique) in Algiers, and a freelance developer who ships real products, not just class assignments.",
-    "I've built AI-integrated tools, full-stack platforms, and multi-agent systems, and I lead HR and event operations at ESI's Scientific Club (CSE). I care about two things on every project: does it work flawlessly, and does it look like nothing else out there.",
+    "I'm Kihal Ayoub — a software engineering student at ESI (École Supérieure d'Informatique) in Algiers, and a freelance developer who ships real products, not just class assignments.",
+    "I've built AI-integrated tools, full-stack platforms, and multi-agent systems. I care about two things on every project: does it work flawlessly, and does it look like nothing else out there.",
   ],
   highlights: [
     "ESI Algiers — Software Engineering",
     "Freelance developer",
     "AI & full-stack",
-    "CSE — HR & Events lead",
+    "From idea to production",
   ],
 };
 
@@ -238,16 +254,6 @@ export const projects: Project[] = [
     },
   },
 ];
-
-/* ------------------------------------------------------------- involvement */
-
-export const involvement = {
-  heading: "Involvement",
-  org: "Club Scientifique de l'ESI (CSE)",
-  timeline: ["Design Department", "Responsable RH (HR Lead)", "Lead Event"],
-  current: "Running for CSE President — 2026 / 2027 season",
-  body: "A full reform platform built around club diagnostics and internal restructuring.",
-};
 
 /* ------------------------------------------------------------ testimonials */
 /*
