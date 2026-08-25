@@ -40,7 +40,7 @@ Next.js · TypeScript · Tailwind CSS · Framer Motion · react-three-fiber · s
 
 I take on full-stack builds, AI-integrated products, landing pages, and automation work.
 
-📧 **Email:** your.email@example.com
+📧 **Email:** nb_kihal@esi.dz
 💼 **LinkedIn:** [linkedin.com/in/kihal-ayoub-219b39298](https://linkedin.com/in/kihal-ayoub-219b39298)
 🐙 **GitHub:** [github.com/nbkihal](https://github.com/nbkihal)
 
