@@ -283,16 +283,16 @@ export const contact = {
    * TODO: replace with your real address before launch.
    * This placeholder will not receive mail.
    */
-  email: "nb_kihal@esi.dz",
+  email: "[EMAIL_ADDRESS]",
   /**
    * TODO: create a form at https://formspree.io and paste its endpoint here.
    * Until then the form falls back to a mailto: link. See README.
    */
-  formspreeEndpoint: "https://formspree.io/f/xnnkqkvj",
+  formspreeEndpoint: "https://formspree.io/f/mjybnoap",
   socials: [
     {
       label: "Email",
-      href: "mailto:nb_kihal@esi.dz",
+      href: "mailto:[EMAIL_ADDRESS]",
       icon: "mail",
       handle: "nb_kihal@esi.dz",
     },
