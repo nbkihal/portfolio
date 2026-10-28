@@ -94,6 +94,20 @@ export const navLinks: NavLink[] = [
   { label: "Contact", href: "#contact" },
 ];
 
+/* ------------------------------------------------------------------- intro */
+
+export const intro = {
+  /** Interactive particle intro shown before the hero. */
+  eyebrow: "Interactive · made of light",
+  /**
+   * Words the particles spell, in order. Clicking (or waiting a few
+   * seconds) morphs to the next one. Keep them short — 2 to 8 characters.
+   */
+  words: ["HELLO", "I BUILD", "WITH AI", "FOR YOU"],
+  hint: "Move your cursor through the light · click to morph",
+  cta: { label: "Enter the portfolio", href: "#top" } satisfies CTA,
+};
+
 /* -------------------------------------------------------------------- hero */
 
 export const hero = {
