@@ -19,22 +19,47 @@ interface TrailPoint {
 }
 
 /*
- * Glow layers for the blade, drawn wide → narrow. Each is a stroke along
- * the trail; stacked, they read as one beam with a white-hot core.
- * [width multiplier, colour (dark theme), colour (light theme)]
+ * Colour gradient along the blade, from the fresh tip to the fading tail:
+ * pale ice blue → sky blue → blue → indigo.
  */
-const LAYERS: Array<[number, string, string]> = [
-  [9, "rgba(255,40,40,0.05)", "rgba(220,38,38,0.05)"],
-  [5, "rgba(255,50,50,0.10)", "rgba(220,38,38,0.09)"],
-  [2.6, "rgba(255,70,60,0.28)", "rgba(220,38,38,0.22)"],
-  [1.4, "rgba(255,120,110,0.6)", "rgba(200,30,30,0.55)"],
-  [0.55, "rgba(255,240,236,0.95)", "rgba(127,29,29,0.9)"],
+const RAMP_DARK = [
+  [200, 238, 255],
+  [125, 211, 252],
+  [56, 189, 248],
+  [59, 130, 246],
+  [99, 102, 241],
+];
+const RAMP_LIGHT = [
+  [14, 165, 233],
+  [2, 132, 199],
+  [3, 105, 161],
+  [37, 99, 235],
+  [79, 70, 229],
 ];
 
+/*
+ * Glow layers, drawn wide → narrow; stacked, they read as one beam.
+ * [width multiplier, opacity (dark theme), opacity (light theme), core?]
+ */
+const LAYERS: Array<[number, number, number, boolean]> = [
+  [9, 0.05, 0.05, false],
+  [5, 0.1, 0.09, false],
+  [2.6, 0.28, 0.22, false],
+  [1.4, 0.6, 0.5, false],
+  [0.55, 0.95, 0.85, true],
+];
+
+function shade(ramp: number[][], t: number) {
+  const f = Math.min(0.999, Math.max(0, t)) * (ramp.length - 1);
+  const i = Math.floor(f);
+  const k = f - i;
+  return ramp[i].map((v, c) => v + (ramp[i + 1][c] - v) * k);
+}
+
 /**
- * Light-blade cursor: the pointer drags a glowing red blade of light that
- * fades slowly, like a slow-motion swing — white-hot core, layered glow,
- * tapering toward the tail. Brightens over interactive elements; a click
+ * Light-blade cursor: the pointer drags a glowing light-blue blade that
+ * fades slowly, like a slow-motion swing — near-white core, layered glow,
+ * shading from ice blue to indigo as it tapers toward the tail. Brightens over interactive elements; a click
  * sends out a slow light ring. Mouse/trackpad only, and off for people who
  * prefer reduced motion.
  */
@@ -111,14 +136,24 @@ export function LightBladeCursor() {
       // can taper with the age of the trail.
       const base = 6 + energy * 2.5;
       if (trail.length > 1) {
-        for (const [mult, darkColor, lightColor] of LAYERS) {
-          ctx.strokeStyle = dark ? darkColor : lightColor;
+        const ramp = dark ? RAMP_DARK : RAMP_LIGHT;
+        for (const [mult, darkAlpha, lightAlpha, core] of LAYERS) {
+          const alpha = dark ? darkAlpha : lightAlpha;
           for (let i = 1; i < trail.length; i++) {
             const a = trail[i - 1];
             const b = trail[i];
             const c = trail[i + 1] ?? b;
             const life = 1 - (now - b.t) / TRAIL_MS;
             if (life <= 0) continue;
+            let [r, g, bl] = shade(ramp, 1 - life);
+            if (core && dark) {
+              // The core stays almost white near the tip.
+              const w = 0.75 * life;
+              r += (255 - r) * w;
+              g += (255 - g) * w;
+              bl += (255 - bl) * w;
+            }
+            ctx.strokeStyle = `rgba(${r | 0},${g | 0},${bl | 0},${alpha})`;
             ctx.lineWidth = Math.max(0.4, base * mult * Math.pow(life, 1.4));
             ctx.beginPath();
             ctx.moveTo((a.x + b.x) / 2, (a.y + b.y) / 2);
@@ -133,8 +168,8 @@ export function LightBladeCursor() {
         const p = (now - ring.t) / 900;
         const ease = 1 - Math.pow(1 - p, 3);
         ctx.strokeStyle = dark
-          ? `rgba(255,80,70,${0.55 * (1 - p)})`
-          : `rgba(200,30,30,${0.45 * (1 - p)})`;
+          ? `rgba(125,211,252,${0.55 * (1 - p)})`
+          : `rgba(2,132,199,${0.45 * (1 - p)})`;
         ctx.lineWidth = 2.5 * (1 - p) + 0.5;
         ctx.beginPath();
         ctx.arc(ring.x, ring.y, 6 + ease * 42, 0, Math.PI * 2);
@@ -155,13 +190,13 @@ export function LightBladeCursor() {
         );
         glow.addColorStop(
           0,
-          dark ? "rgba(255,235,230,0.85)" : "rgba(185,28,28,0.7)",
+          dark ? "rgba(230,247,255,0.85)" : "rgba(2,132,199,0.7)",
         );
         glow.addColorStop(
           0.3,
-          dark ? "rgba(255,60,50,0.35)" : "rgba(220,38,38,0.25)",
+          dark ? "rgba(56,189,248,0.35)" : "rgba(14,165,233,0.25)",
         );
-        glow.addColorStop(1, "rgba(255,30,30,0)");
+        glow.addColorStop(1, "rgba(59,130,246,0)");
         ctx.fillStyle = glow;
         ctx.beginPath();
         ctx.arc(head.x, head.y, r, 0, Math.PI * 2);
