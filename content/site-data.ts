@@ -53,6 +53,15 @@ export interface Service {
 export type ProjectCategory =
   "Web" | "Mobile" | "AI" | "Games" | "Client & pro";
 
+/** A screenshot, shown inside a laptop or phone mockup. */
+export interface ProjectShot {
+  /** Path under /public, e.g. "/projects/logic/home.webp". */
+  src: string;
+  alt: string;
+  /** Desktop shots go in a laptop frame, mobile shots in a phone frame. */
+  device: "laptop" | "phone";
+}
+
 /** How prominently a project card renders in the bento grid. */
 export type ProjectSize = "lg" | "md";
 
@@ -66,6 +75,11 @@ export interface Project {
   liveUrl?: string;
   size: ProjectSize;
   categories: ProjectCategory[];
+  /**
+   * Screenshots, best first. The first laptop + first phone shot form the
+   * card cover; all of them appear in the project page's gallery.
+   */
+  shots?: ProjectShot[];
   /** Expanded case-study view: problem → build → outcome. */
   caseStudy: {
     problem: string;
@@ -382,6 +396,18 @@ export const projects: Project[] = [
     tech: ["JavaScript", "Firebase", "Vite", "PWA", "Vitest"],
     size: "lg",
     categories: ["Web", "Mobile", "Client & pro"],
+    shots: [
+      {
+        src: "/projects/staff-pro/admin-login.webp",
+        alt: "WeCheckin administration portal sign-in",
+        device: "laptop",
+      },
+      {
+        src: "/projects/staff-pro/employee-app.webp",
+        alt: "WeCheckin RH employee app sign-in screen",
+        device: "phone",
+      },
+    ],
     caseStudy: {
       problem:
         "A production HR app that companies rely on every day for clock-ins, schedules, overtime and payroll had grown hard to maintain and needed hardening — without any downtime for its users.",
@@ -418,6 +444,28 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/nbkihal/Logic",
     size: "md",
     categories: ["Mobile", "Games"],
+    shots: [
+      {
+        src: "/projects/logic/home.webp",
+        alt: "Logic home screen with the START button",
+        device: "phone",
+      },
+      {
+        src: "/projects/logic/desktop.webp",
+        alt: "Logic running in a desktop browser",
+        device: "laptop",
+      },
+      {
+        src: "/projects/logic/levels.webp",
+        alt: "Level list for the first chapter, First Signals",
+        device: "phone",
+      },
+      {
+        src: "/projects/logic/solved.webp",
+        alt: "Level solved with three stars",
+        device: "phone",
+      },
+    ],
     caseStudy: {
       problem:
         "Digital logic is usually taught with static diagrams. Students learn faster when they can build circuits themselves and see them work or fail right away.",
@@ -435,6 +483,28 @@ export const projects: Project[] = [
     tech: ["React", "TypeScript", "pdf-lib", "Tailwind CSS", "Vitest"],
     size: "md",
     categories: ["Web", "Client & pro"],
+    shots: [
+      {
+        src: "/projects/medical-documents/preview.webp",
+        alt: "Document preview with source, generation time and PDF export",
+        device: "laptop",
+      },
+      {
+        src: "/projects/medical-documents/mobile.webp",
+        alt: "Reconstructed discharge summary on a phone",
+        device: "phone",
+      },
+      {
+        src: "/projects/medical-documents/page-1.webp",
+        alt: "First page of a reconstructed hospital discharge summary",
+        device: "laptop",
+      },
+      {
+        src: "/projects/medical-documents/page-2.webp",
+        alt: "Laboratory results table rebuilt from API data",
+        device: "laptop",
+      },
+    ],
     caseStudy: {
       problem:
         "A digital medical platform extracts and translates documents through separate services. Someone has to turn that structured data back into a faithful, readable document.",
@@ -453,6 +523,28 @@ export const projects: Project[] = [
     liveUrl: "https://mosque-registration-portail.vercel.app",
     size: "md",
     categories: ["Web", "Client & pro"],
+    shots: [
+      {
+        src: "/projects/quran-school-portal/hero.webp",
+        alt: "Quranic school landing page in Arabic",
+        device: "laptop",
+      },
+      {
+        src: "/projects/quran-school-portal/mobile.webp",
+        alt: "The Quranic school site on a phone",
+        device: "phone",
+      },
+      {
+        src: "/projects/quran-school-portal/section-2.webp",
+        alt: "About the school section",
+        device: "laptop",
+      },
+      {
+        src: "/projects/quran-school-portal/section-3.webp",
+        alt: "Classes section of the school site",
+        device: "laptop",
+      },
+    ],
     caseStudy: {
       problem:
         "A mosque's Quranic school was handling registrations on paper and needed a simple, trustworthy way for families to sign up online, in Arabic.",
@@ -471,6 +563,23 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/Dali-MDB/Traveleo",
     size: "lg",
     categories: ["Web"],
+    shots: [
+      {
+        src: "/projects/traveleo/home.webp",
+        alt: "Traveleo home page with flight search",
+        device: "laptop",
+      },
+      {
+        src: "/projects/traveleo/mobile.webp",
+        alt: "Traveleo home page on a phone",
+        device: "phone",
+      },
+      {
+        src: "/projects/traveleo/destinations.webp",
+        alt: "Popular destinations on Traveleo",
+        device: "laptop",
+      },
+    ],
     caseStudy: {
       problem:
         "A travel agency needs more than a brochure site — it needs real data models, working flows, and a deployment story a team can actually run.",
@@ -506,6 +615,28 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/nbkihal/2048-game",
     size: "md",
     categories: ["Mobile", "Games"],
+    shots: [
+      {
+        src: "/projects/2048-stages/game.webp",
+        alt: "2048 game in progress on stage 1",
+        device: "phone",
+      },
+      {
+        src: "/projects/2048-stages/home.webp",
+        alt: "2048 home with daily challenge, stages and endless mode",
+        device: "phone",
+      },
+      {
+        src: "/projects/2048-stages/stages.webp",
+        alt: "Stage select with targets and rules",
+        device: "phone",
+      },
+      {
+        src: "/projects/2048-stages/skins.webp",
+        alt: "Unlockable tile skins",
+        device: "phone",
+      },
+    ],
     caseStudy: {
       problem:
         "Classic 2048 is fun for ten minutes and then repeats itself. It has no goals, no progression and no reason to come back tomorrow.",

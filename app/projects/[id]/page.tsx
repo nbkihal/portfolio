@@ -14,6 +14,8 @@ import {
 import { projects } from "@/content/site-data";
 import { AmbientLights } from "@/components/ambient-lights";
 import { LightCard } from "@/components/light-card";
+import { ProjectShowcase } from "@/components/project-showcase";
+import { ShotGallery } from "@/components/shot-gallery";
 import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
 
@@ -167,6 +169,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </div>
       </header>
 
+      {/* --------------------------------------------------------- showcase */}
+      {project.shots?.length ? (
+        <section
+          aria-label="Preview"
+          className="container relative pb-20 md:pb-28"
+        >
+          <Reveal delay={0.15}>
+            <div className="group mx-auto max-w-4xl">
+              <ProjectShowcase shots={project.shots} size="hero" />
+            </div>
+          </Reveal>
+        </section>
+      ) : null}
+
       {/* -------------------------------------------------------- case study */}
       <section className="container relative pb-20 md:pb-28">
         <div className="relative mx-auto max-w-3xl">
@@ -198,6 +214,30 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </ol>
         </div>
       </section>
+
+      {/* ---------------------------------------------------------- gallery */}
+      {project.shots?.length ? (
+        <section className="container relative pb-20 md:pb-28">
+          <Reveal>
+            <div className="mb-12 text-center">
+              <span className="inline-flex items-center gap-2 text-sm font-medium uppercase tracking-widest text-brand">
+                <span className="h-px w-6 bg-brand" />
+                Screens
+                <span className="h-px w-6 bg-brand" />
+              </span>
+              <h2 className="mt-3 font-display text-3xl font-bold tracking-tight md:text-4xl">
+                See it running
+              </h2>
+              <p className="mt-3 text-muted-foreground">
+                Captured from the real app. Click any screen to enlarge it.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <ShotGallery shots={project.shots} />
+          </Reveal>
+        </section>
+      ) : null}
 
       {/* ------------------------------------------------------- navigation */}
       <section className="container relative pb-24">
