@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 import { techStack } from "@/content/site-data";
-import { techIcons, type TechName } from "@/lib/tech-icons";
+import { brandColor, techIcons, type TechName } from "@/lib/tech-icons";
 
 /**
  * Infinite, gray strip of tech logos. Each logo lights up in its brand
@@ -42,7 +42,7 @@ function TechList({ hidden = false }: { hidden?: boolean }) {
 
 function TechItem({ name }: { name: TechName }) {
   const icon = techIcons[name];
-  const hover = isDark(icon.hex) ? "hsl(var(--foreground))" : `#${icon.hex}`;
+  const hover = brandColor(icon);
 
   return (
     <li
@@ -61,10 +61,4 @@ function TechItem({ name }: { name: TechName }) {
       </span>
     </li>
   );
-}
-
-/** True for brand colours too dark to show on the dark theme. */
-function isDark(hex: string) {
-  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b < 60;
 }

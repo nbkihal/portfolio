@@ -62,6 +62,14 @@ export interface ProjectShot {
   device: "laptop" | "phone";
 }
 
+/** A real excerpt of a project's source, shown in an editor window. */
+export interface ProjectCode {
+  /** Path inside the repo, shown as the editor tab. */
+  file: string;
+  language: "python" | "typescript" | "dart";
+  snippet: string;
+}
+
 /** How prominently a project card renders in the bento grid. */
 export type ProjectSize = "lg" | "md";
 
@@ -80,6 +88,8 @@ export interface Project {
    * card cover; all of them appear in the project page's gallery.
    */
   shots?: ProjectShot[];
+  /** Used as the visual when a project has no screenshots (e.g. a CLI). */
+  code?: ProjectCode;
   /** Expanded case-study view: problem → build → outcome. */
   caseStudy: {
     problem: string;
@@ -426,6 +436,24 @@ export const projects: Project[] = [
     githubUrl: "https://github.com/Erraid7/Refactoring-Swarm-Equipe-24",
     size: "md",
     categories: ["AI"],
+    code: {
+      file: "src/orchestration/workflow.py",
+      language: "python",
+      snippet: `auditor = AuditorAgent()
+fixer = FixerAgent()
+judge = JudgeAgent()
+
+# Phase 1: initial audit (once)
+state = auditor.execute(state)
+
+# Phase 2: fix-test loop
+while state.should_continue():
+    state.increment_iteration()
+    state = fixer.execute(state)  # fix the code
+    state = judge.execute(state)  # test and evaluate
+    if state.tests_passed:
+        break`,
+    },
     caseStudy: {
       problem:
         "Refactoring legacy Python is tedious and risky — it needs auditing, safe edits, tests, and docs, usually spread across several people.",

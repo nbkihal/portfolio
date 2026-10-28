@@ -10,10 +10,11 @@ interface ProjectShowcaseProps {
 }
 
 /**
- * Arranges a project's screenshots into a device composition:
- * - laptop + phone → the phone leans in front of the laptop's corner
- * - phones only    → up to three phones fanned out
- * - laptop only    → a single laptop
+ * Arranges a project's screenshots into a device composition, led by the
+ * first shot's device:
+ * - laptop first (and a phone exists) → phone leaning on the laptop
+ * - phone first                       → up to three phones fanned out
+ * - laptop only                       → a single laptop
  * Devices shift apart slightly when the surrounding `group` is hovered.
  */
 export function ProjectShowcase({
@@ -22,6 +23,7 @@ export function ProjectShowcase({
   className,
 }: ProjectShowcaseProps) {
   const hero = size === "hero";
+  const leadIsPhone = shots[0]?.device === "phone";
   const laptop = shots.find((s) => s.device === "laptop");
   const phones = shots.filter((s) => s.device === "phone").slice(0, 3);
   const laptopSizes = hero
@@ -39,7 +41,7 @@ export function ProjectShowcase({
         className="absolute inset-x-[10%] bottom-0 top-[20%] rounded-full bg-gradient-to-r from-brand/30 to-cyan/25 blur-3xl"
       />
 
-      {laptop && phones[0] ? (
+      {laptop && phones[0] && !leadIsPhone ? (
         <div className="relative pb-[6%] pr-[14%]">
           <LaptopMockup
             src={laptop.src}

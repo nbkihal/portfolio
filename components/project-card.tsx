@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { LightCard } from "@/components/light-card";
 import { ProjectShowcase } from "@/components/project-showcase";
+import { CodeWindow } from "@/components/code-window";
+import { TechHeader } from "@/components/tech-header";
 
 interface ProjectCardProps {
   project: Project;
@@ -36,23 +38,32 @@ export function ProjectCard({
         {String(index + 1).padStart(2, "0")}
       </span>
 
-      {shots.length > 0 ? (
-        featured ? (
-          // Featured: devices beside the text on wide screens.
-          <div className="relative order-first p-6 pb-0 lg:order-last lg:w-1/2 lg:self-center lg:p-8 lg:pl-0">
-            <ProjectShowcase shots={shots} />
-          </div>
-        ) : (
-          // Regular: devices peek out of a lit header strip.
-          <div className="relative h-56 overflow-hidden border-b bg-gradient-to-b from-brand/[0.08] to-transparent px-8 pt-7">
-            <ProjectShowcase shots={shots} />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-card to-transparent"
-            />
-          </div>
-        )
-      ) : null}
+      {featured && shots.length > 0 ? (
+        // Featured: devices beside the text on wide screens.
+        <div className="relative order-first p-6 pb-0 lg:order-last lg:w-1/2 lg:self-center lg:p-8 lg:pl-0">
+          <ProjectShowcase shots={shots} />
+        </div>
+      ) : (
+        // Regular: the visual peeks out of a lit header strip — devices,
+        // else a real code excerpt, else the tech logos.
+        <div className="relative h-56 overflow-hidden border-b bg-gradient-to-b from-brand/[0.08] to-transparent">
+          {shots.length > 0 ? (
+            <div className="px-8 pt-7">
+              <ProjectShowcase shots={shots} />
+            </div>
+          ) : project.code ? (
+            <div className="px-6 pt-6 transition-transform duration-500 group-hover:-translate-y-1">
+              <CodeWindow code={project.code} />
+            </div>
+          ) : (
+            <TechHeader tech={project.tech} />
+          )}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-card to-transparent"
+          />
+        </div>
+      )}
 
       <div className="relative flex flex-1 flex-col p-6">
         <div className="mb-3 flex items-center gap-2 text-brand">

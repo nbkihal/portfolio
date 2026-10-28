@@ -16,6 +16,7 @@ import { AmbientLights } from "@/components/ambient-lights";
 import { LightCard } from "@/components/light-card";
 import { ProjectShowcase } from "@/components/project-showcase";
 import { ShotGallery } from "@/components/shot-gallery";
+import { CodeWindow } from "@/components/code-window";
 import { Reveal } from "@/components/reveal";
 import { Button } from "@/components/ui/button";
 
@@ -178,6 +179,25 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           <Reveal delay={0.15}>
             <div className="group mx-auto max-w-4xl">
               <ProjectShowcase shots={project.shots} size="hero" />
+            </div>
+          </Reveal>
+        </section>
+      ) : project.code ? (
+        <section
+          aria-label="Code excerpt"
+          className="container relative pb-20 md:pb-28"
+        >
+          <Reveal delay={0.15}>
+            <div className="relative mx-auto max-w-3xl">
+              <div
+                aria-hidden
+                className="absolute inset-x-[10%] inset-y-0 rounded-full bg-gradient-to-r from-brand/30 to-cyan/25 blur-3xl"
+              />
+              <CodeWindow code={project.code} className="relative" />
+              <p className="mt-4 text-center text-sm text-muted-foreground">
+                Excerpt from{" "}
+                <code className="font-mono">{project.code.file}</code>
+              </p>
             </div>
           </Reveal>
         </section>
