@@ -153,8 +153,8 @@ export function FlameCursor() {
         vx: 0,
         vy: 0,
         age: 0,
-        life: ember ? 0.9 + Math.random() * 1.1 : 0.32 + Math.random() * 0.42,
-        size: ember ? 1.6 + Math.random() * 2 : 10 + Math.random() * 14,
+        life: ember ? 0.9 + Math.random() * 1.1 : 0.45 + Math.random() * 0.5,
+        size: ember ? 1.6 + Math.random() * 2 : 12 + Math.random() * 12,
         seed: Math.random() * 1000,
         ember,
         ...opts,
@@ -191,7 +191,7 @@ export function FlameCursor() {
 
       // Emit: a steady idle burn, more while moving, more on hover.
       if (pointer.inside) {
-        carry += dt * (110 + Math.min(speed, 2400) * 0.22) * (1 + flare * 0.9);
+        carry += dt * (190 + Math.min(speed, 2400) * 0.22) * (1 + flare * 0.9);
         while (carry >= 1) {
           carry -= 1;
           const along = Math.random();
@@ -200,8 +200,8 @@ export function FlameCursor() {
             x: pointer.x - pointer.vx * dt * along + (Math.random() - 0.5) * 7,
             y: pointer.y - pointer.vy * dt * along + (Math.random() - 0.5) * 4,
             vx: -pointer.vx * 0.12 + (Math.random() - 0.5) * 40,
-            vy: -60 - Math.random() * 90 - pointer.vy * 0.08,
-            size: (10 + Math.random() * 14) * (1 + flare * 0.45),
+            vy: -90 - Math.random() * 120 - pointer.vy * 0.08,
+            size: (12 + Math.random() * 12) * (1 + flare * 0.45),
           });
           if (Math.random() < 0.035 + flare * 0.05) {
             spawn({
@@ -228,9 +228,12 @@ export function FlameCursor() {
           p.vx *= 0.985;
           p.vy *= 0.985;
         } else {
-          p.vy -= 260 * dt; // buoyancy: hot gas rises
-          p.vx += n * 260 * dt;
-          p.vx *= 0.93;
+          // Buoyancy: hot gas rises. Turbulence grows with age, so the
+          // base stays compact while the upper tongues sway and split.
+          const age = p.age / p.life;
+          p.vy -= 380 * dt;
+          p.vx += n * (120 + 520 * age) * dt;
+          p.vx *= 0.92;
           p.vy *= 0.97;
         }
         p.x += p.vx * dt;
@@ -255,7 +258,7 @@ export function FlameCursor() {
         // Flames narrow and cool as they rise; a flicker term keeps the
         // body of the flame breathing.
         const flicker = 0.85 + 0.15 * Math.sin(time * 24 + p.seed);
-        const size = p.size * (1 - t * 0.72) * flicker;
+        const size = p.size * (1 - t * 0.8) * flicker;
         const sprite = sprites[Math.min(STEPS - 1, Math.floor(t * STEPS))];
         ctx.globalAlpha = Math.pow(1 - t, 1.1) * (dark ? 0.9 : 0.7);
         ctx.drawImage(sprite, p.x - size, p.y - size, size * 2, size * 2);
