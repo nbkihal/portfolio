@@ -8,9 +8,9 @@ const INTERACTIVE =
   "a, button, [role='button'], input, textarea, select, label, summary";
 
 /** How long a point of the trail stays visible — the "slow motion". */
-const TRAIL_MS = 750;
+const TRAIL_MS = 550;
 /** Head easing toward the pointer (higher = snappier, lower = heavier). */
-const FOLLOW = 16;
+const FOLLOW = 34;
 
 interface TrailPoint {
   x: number;
@@ -179,7 +179,7 @@ export function LightBladeCursor() {
       // Tip of the blade: a humming point of light.
       if (pointer.inside) {
         const hum = 1 + Math.sin(now / 140) * 0.08 + energy * 0.35;
-        const r = 14 * hum;
+        const r = 8 * hum;
         const glow = ctx.createRadialGradient(
           head.x,
           head.y,
