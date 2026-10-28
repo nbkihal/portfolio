@@ -3,10 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, MousePointerClick } from "lucide-react";
 
-import { intro } from "@/content/site-data";
+import { intro, type IntroPhrase } from "@/content/site-data";
 
 /** Brand violet + cyan, matched to the CSS design tokens. */
 const BRAND = [139, 92, 246];
@@ -20,8 +20,12 @@ const FRICTION = 0.86;
 const REPEL_RADIUS = 110;
 const REPEL_FORCE = 2.6;
 const BURST_RADIUS = 280;
-const AUTO_MORPH_MS = 5000;
-const MAX_PARTICLES = 3200;
+/** Time a phrase stays up: a base plus a bit per character to read it. */
+const HOLD_BASE_MS = 3200;
+const HOLD_PER_CHAR_MS = 70;
+const MAX_PARTICLES = 4200;
+const MAX_LINES = 3;
+const MONO_FONT = "ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace";
 
 interface Particle {
   x: number;
@@ -64,24 +68,74 @@ function makeSprites(dark: boolean) {
   });
 }
 
-/** Render the word off-screen and return evenly spaced points inside it. */
-function sampleText(text: string, w: number, h: number, fontFamily: string) {
+/**
+ * Split a phrase into 1–3 balanced lines and pick the font size that
+ * fills the space best (fewer lines win unless more lines are much bigger).
+ */
+function layoutLines(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  w: number,
+  h: number,
+  font: string,
+) {
+  const words = text.split(" ");
+  ctx.font = `700 100px ${font}`;
+  const measure = (t: string) => ctx.measureText(t).width;
+  const space = measure(" ");
+  let best = { lines: [text], fontSize: 0 };
+
+  for (let n = 1; n <= Math.min(MAX_LINES, words.length); n++) {
+    const target = measure(text) / n;
+    const lines: string[] = [];
+    let current = "";
+    for (const word of words) {
+      const next = current ? `${current} ${word}` : word;
+      if (current && measure(next) > target + space && lines.length < n - 1) {
+        lines.push(current);
+        current = word;
+      } else {
+        current = next;
+      }
+    }
+    lines.push(current);
+
+    const widest = Math.max(...lines.map(measure));
+    const fontSize = Math.min(
+      (w * 0.86 * 100) / widest,
+      (h * 0.56) / (lines.length * 1.15),
+      240,
+    );
+    if (fontSize > best.fontSize * 1.2) best = { lines, fontSize };
+  }
+  return best;
+}
+
+/** Render the phrase off-screen and return evenly spaced points inside it. */
+function sampleText(
+  phrase: IntroPhrase,
+  w: number,
+  h: number,
+  displayFont: string,
+) {
   const off = document.createElement("canvas");
   off.width = Math.max(1, Math.floor(w));
   off.height = Math.max(1, Math.floor(h));
   const ctx = off.getContext("2d", { willReadFrequently: true })!;
 
-  let fontSize = Math.min(h * 0.34, 240);
-  ctx.font = `700 ${fontSize}px ${fontFamily}`;
-  const maxWidth = w * 0.86;
-  const measured = ctx.measureText(text).width;
-  if (measured > maxWidth) fontSize *= maxWidth / measured;
+  const font = phrase.code ? MONO_FONT : displayFont;
+  const { lines, fontSize } = layoutLines(ctx, phrase.text, w, h, font);
+  const lineHeight = fontSize * 1.15;
 
-  ctx.font = `700 ${fontSize}px ${fontFamily}`;
+  ctx.font = `700 ${fontSize}px ${font}`;
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.fillStyle = "#000";
-  ctx.fillText(text, off.width / 2, off.height / 2);
+  // Sit the block slightly above centre to leave room for the caption.
+  const top = off.height * 0.47 - ((lines.length - 1) * lineHeight) / 2;
+  lines.forEach((line, i) => {
+    ctx.fillText(line, off.width / 2, top + i * lineHeight);
+  });
   const data = ctx.getImageData(0, 0, off.width, off.height).data;
 
   let gap = Math.max(3, Math.round(fontSize / 36));
@@ -104,8 +158,8 @@ export function Intro() {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   // Kept outside the effect so a theme switch doesn't scatter the word.
   const particlesRef = React.useRef<Particle[]>([]);
-  const wordIndexRef = React.useRef(0);
-  const [word, setWord] = React.useState(intro.words[0]);
+  const phraseIndexRef = React.useRef(0);
+  const [phrase, setPhrase] = React.useState(intro.phrases[0]);
   const reduceMotion = useReducedMotion();
   const { resolvedTheme } = useTheme();
   const dark = resolvedTheme !== "light";
@@ -136,8 +190,7 @@ export function Intro() {
       ctx.globalCompositeOperation = dark ? "lighter" : "source-over";
       for (const p of particles) {
         const step = Math.floor((p.x / width) * COLOR_STEPS);
-        const sprite =
-          sprites[Math.min(COLOR_STEPS - 1, Math.max(0, step))];
+        const sprite = sprites[Math.min(COLOR_STEPS - 1, Math.max(0, step))];
         const size = (p.dust ? dotSize * 0.6 : dotSize) * (1 + p.glow * 1.3);
         ctx.globalAlpha = p.dust ? 0.3 : Math.min(1, 0.6 + p.glow * 0.4);
         ctx.drawImage(sprite, p.x - size / 2, p.y - size / 2, size, size);
@@ -151,7 +204,7 @@ export function Intro() {
     const retarget = () => {
       if (!width || !height) return;
       const { points, gap } = sampleText(
-        intro.words[wordIndexRef.current],
+        intro.phrases[phraseIndexRef.current],
         width,
         height,
         fontFamily,
@@ -192,8 +245,9 @@ export function Intro() {
     };
 
     const morph = (burstX?: number, burstY?: number) => {
-      wordIndexRef.current = (wordIndexRef.current + 1) % intro.words.length;
-      setWord(intro.words[wordIndexRef.current]);
+      phraseIndexRef.current =
+        (phraseIndexRef.current + 1) % intro.phrases.length;
+      setPhrase(intro.phrases[phraseIndexRef.current]);
       lastMorph = performance.now();
       if (burstX !== undefined && burstY !== undefined && !reduceMotion) {
         for (const p of particles) {
@@ -213,7 +267,10 @@ export function Intro() {
 
     const step = () => {
       const now = performance.now();
-      if (!pointer.active && now - lastMorph > AUTO_MORPH_MS) morph();
+      const hold =
+        HOLD_BASE_MS +
+        intro.phrases[phraseIndexRef.current].text.length * HOLD_PER_CHAR_MS;
+      if (!pointer.active && now - lastMorph > hold) morph();
 
       for (const p of particles) {
         if (p.dust) {
@@ -337,9 +394,29 @@ export function Intro() {
         <canvas
           ref={canvasRef}
           role="img"
-          aria-label={`Glowing particles spelling “${word}”`}
+          aria-label={`Glowing particles spelling “${phrase.text}”${phrase.by ? ` — ${phrase.by}` : ""}`}
           className="h-full w-full"
         />
+      </div>
+
+      {/* Quote author */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-[22%] flex justify-center px-6 md:bottom-[20%]">
+        <AnimatePresence mode="wait">
+          {phrase.by ? (
+            <motion.p
+              key={phrase.text}
+              initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="inline-flex items-center gap-3 font-display text-base text-muted-foreground md:text-lg"
+            >
+              <span className="h-px w-8 bg-gradient-to-r from-transparent to-brand" />
+              {phrase.by}
+              <span className="h-px w-8 bg-gradient-to-l from-transparent to-cyan" />
+            </motion.p>
+          ) : null}
+        </AnimatePresence>
       </div>
 
       <p className="pointer-events-none absolute top-24 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-muted-foreground backdrop-blur">

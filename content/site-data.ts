@@ -65,6 +65,15 @@ export interface Project {
   };
 }
 
+/** One line the intro particles spell. */
+export interface IntroPhrase {
+  text: string;
+  /** Author, shown as a caption under quotes. */
+  by?: string;
+  /** Render in a monospace font (for code snippets). */
+  code?: boolean;
+}
+
 /** One stop on the Parcours roadmap. */
 export interface Milestone {
   /** Short label shown on the roadmap node (a year, a season, "Now"…). */
@@ -116,14 +125,39 @@ export const navLinks: NavLink[] = [
 
 /* ------------------------------------------------------------------- intro */
 
+/**
+ * What the particles spell, in order — dev words, sentences and quotes.
+ * Clicking (or waiting) morphs to the next one; longer lines stay up
+ * longer and wrap onto up to three lines. `by` is shown as a caption
+ * under quotes, and `code: true` renders in a monospace font.
+ */
+const introPhrases: IntroPhrase[] = [
+  { text: "Hello, World!", code: true },
+  { text: "Talk is cheap. Show me the code.", by: "Linus Torvalds" },
+  { text: "git push origin main", code: true },
+  {
+    text: "Simplicity is prerequisite for reliability.",
+    by: "Edsger W. Dijkstra",
+  },
+  { text: "</>", code: true },
+  {
+    text: "First, solve the problem. Then, write the code.",
+    by: "John Johnson",
+  },
+  { text: "It works on my machine.", by: "Every developer, ever" },
+  { text: "Make it work, make it right, make it fast.", by: "Kent Beck" },
+  { text: "while (alive) { code(); }", code: true },
+  { text: "Code never lies, comments sometimes do.", by: "Ron Jeffries" },
+  {
+    text: "Programs must be written for people to read.",
+    by: "Harold Abelson",
+  },
+];
+
 export const intro = {
   /** Interactive particle intro shown before the hero. */
   eyebrow: "Interactive · made of light",
-  /**
-   * Words the particles spell, in order. Clicking (or waiting a few
-   * seconds) morphs to the next one. Keep them short — 2 to 8 characters.
-   */
-  words: ["HELLO", "I BUILD", "WITH AI", "FOR YOU"],
+  phrases: introPhrases,
   hint: "Move your cursor through the light · click to morph",
   cta: { label: "Enter the portfolio", href: "/#top" } satisfies CTA,
 };
@@ -447,4 +481,3 @@ export const contact = {
     },
   ] satisfies SocialLink[],
 };
-
