@@ -8,7 +8,7 @@ const INTERACTIVE =
   "a, button, [role='button'], input, textarea, select, label, summary";
 
 /** How long a point of the trail stays visible — the "slow motion". */
-const TRAIL_MS = 550;
+const TRAIL_MS = 320;
 /** Head easing toward the pointer (higher = snappier, lower = heavier). */
 const FOLLOW = 34;
 
@@ -92,6 +92,8 @@ export function LightBladeCursor() {
     const rings: Array<{ x: number; y: number; t: number }> = [];
     const pointer = { x: -100, y: -100, inside: false, hover: false };
     const head = { x: -100, y: -100 };
+    const prevHead = { x: -100, y: -100 };
+    let motion = 0;
     let width = 0;
     let height = 0;
     let raf = 0;
@@ -117,6 +119,13 @@ export function LightBladeCursor() {
       head.x += (pointer.x - head.x) * k;
       head.y += (pointer.y - head.y) * k;
       energy += ((pointer.hover ? 1 : 0) - energy) * (1 - Math.exp(-dt * 10));
+      // 0 at rest → 1 when moving fast; shrinks and dims the tip in motion.
+      const speed =
+        Math.hypot(head.x - prevHead.x, head.y - prevHead.y) /
+        Math.max(dt, 0.001);
+      prevHead.x = head.x;
+      prevHead.y = head.y;
+      motion += (Math.min(1, speed / 700) - motion) * (1 - Math.exp(-dt * 12));
 
       if (pointer.inside) {
         const prev = trail[trail.length - 1];
@@ -134,7 +143,7 @@ export function LightBladeCursor() {
 
       // Blade: each glow layer is stroked segment by segment so its width
       // can taper with the age of the trail.
-      const base = 6.5 + energy * 2.5;
+      const base = (4.5 + energy * 2) * (1 - motion * 0.3);
       if (trail.length > 1) {
         const ramp = dark ? RAMP_DARK : RAMP_LIGHT;
         for (const [mult, darkAlpha, lightAlpha, core] of LAYERS) {
@@ -179,7 +188,8 @@ export function LightBladeCursor() {
       // Tip of the blade: a humming point of light.
       if (pointer.inside) {
         const hum = 1 + Math.sin(now / 140) * 0.08 + energy * 0.35;
-        const r = 8 * hum;
+        const r = 8 * hum * (1 - motion * 0.45);
+        ctx.globalAlpha = 1 - motion * 0.55;
         const glow = ctx.createRadialGradient(
           head.x,
           head.y,
@@ -201,6 +211,7 @@ export function LightBladeCursor() {
         ctx.beginPath();
         ctx.arc(head.x, head.y, r, 0, Math.PI * 2);
         ctx.fill();
+        ctx.globalAlpha = 1;
       }
       ctx.globalCompositeOperation = "source-over";
 
@@ -221,8 +232,8 @@ export function LightBladeCursor() {
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       if (!pointer.inside) {
-        head.x = e.clientX;
-        head.y = e.clientY;
+        head.x = prevHead.x = e.clientX;
+        head.y = prevHead.y = e.clientY;
       }
       pointer.x = e.clientX;
       pointer.y = e.clientY;
