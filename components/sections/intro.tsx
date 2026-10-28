@@ -7,7 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, MousePointerClick } from "lucide-react";
 
 import { intro, type IntroPhrase } from "@/content/site-data";
-import { LightRunner } from "@/components/light-runner";
+import { TypingTest } from "@/components/typing-test";
 
 /** Brand violet + cyan, matched to the CSS design tokens. */
 const BRAND = [139, 92, 246];
@@ -26,7 +26,7 @@ const HOLD_BASE_MS = 3200;
 const HOLD_PER_CHAR_MS = 70;
 const MAX_PARTICLES = 4200;
 const MAX_LINES = 3;
-/** Press-and-hold this long to charge the particles and start the game. */
+/** Press-and-hold this long to charge the particles and open the typing test. */
 const CHARGE_MS = 1300;
 /** Presses shorter than this are clicks (morph), not charges. */
 const CLICK_MAX_MS = 350;
@@ -174,7 +174,7 @@ export function Intro() {
     const container = containerRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    // While the game runs the particle scene sleeps; on exit this effect
+    // While the typing test runs the particle scene sleeps; on exit this effect
     // re-runs and the scattered particles fly back into the phrase.
     if (!container || !canvas || !ctx || playing) return;
 
@@ -337,7 +337,7 @@ export function Intro() {
 
       for (const p of particles) {
         if (exploding) {
-          // Free flight outward — no springs until the game takes over.
+          // Free flight outward — no springs until the typing test takes over.
           p.vx *= 0.96;
           p.vy *= 0.96;
           p.x += p.vx;
@@ -516,7 +516,7 @@ export function Intro() {
       </div>
 
       {playing ? (
-        <LightRunner dark={dark} onExit={() => setPlaying(false)} />
+        <TypingTest onExit={() => setPlaying(false)} />
       ) : null}
 
       {/* Quote author */}
