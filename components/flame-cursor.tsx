@@ -61,9 +61,9 @@ function makeSprites(ramp: number[][], dark: boolean) {
     c.width = c.height = 64;
     const ctx = c.getContext("2d")!;
     const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, `rgba(${r},${g},${b},${dark ? 0.9 : 0.75})`);
-    grad.addColorStop(0.3, `rgba(${r},${g},${b},${dark ? 0.45 : 0.4})`);
-    grad.addColorStop(0.65, `rgba(${r},${g},${b},${dark ? 0.12 : 0.1})`);
+    grad.addColorStop(0, `rgba(${r},${g},${b},${dark ? 0.9 : 0.5})`);
+    grad.addColorStop(0.3, `rgba(${r},${g},${b},${dark ? 0.45 : 0.32})`);
+    grad.addColorStop(0.65, `rgba(${r},${g},${b},${dark ? 0.12 : 0.12})`);
     grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 64, 64);
@@ -191,7 +191,7 @@ export function FlameCursor() {
 
       // Emit: a steady idle burn, more while moving, more on hover.
       if (pointer.inside) {
-        carry += dt * (190 + Math.min(speed, 2400) * 0.22) * (1 + flare * 0.9);
+        carry += dt * (190 + Math.min(speed, 2400) * 0.22) * (1 + flare * 0.5);
         while (carry >= 1) {
           carry -= 1;
           const along = Math.random();
@@ -201,7 +201,7 @@ export function FlameCursor() {
             y: pointer.y - pointer.vy * dt * along + (Math.random() - 0.5) * 4,
             vx: -pointer.vx * 0.12 + (Math.random() - 0.5) * 40,
             vy: -90 - Math.random() * 120 - pointer.vy * 0.08,
-            size: (12 + Math.random() * 12) * (1 + flare * 0.45),
+            size: (12 + Math.random() * 12) * (1 + flare * 0.22),
           });
           if (Math.random() < 0.035 + flare * 0.05) {
             spawn({
@@ -260,7 +260,7 @@ export function FlameCursor() {
         const flicker = 0.85 + 0.15 * Math.sin(time * 24 + p.seed);
         const size = p.size * (1 - t * 0.8) * flicker;
         const sprite = sprites[Math.min(STEPS - 1, Math.floor(t * STEPS))];
-        ctx.globalAlpha = Math.pow(1 - t, 1.1) * (dark ? 0.9 : 0.7);
+        ctx.globalAlpha = Math.pow(1 - t, 1.1) * (dark ? 0.75 : 0.55);
         ctx.drawImage(sprite, p.x - size, p.y - size, size * 2, size * 2);
       }
       ctx.globalAlpha = 1;
