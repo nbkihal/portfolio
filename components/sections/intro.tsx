@@ -7,6 +7,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowDown, MousePointerClick } from "lucide-react";
 
 import { intro, type IntroPhrase } from "@/content/site-data";
+import { LightRunner } from "@/components/light-runner";
 
 /** Brand violet + cyan, matched to the CSS design tokens. */
 const BRAND = [139, 92, 246];
@@ -25,6 +26,10 @@ const HOLD_BASE_MS = 3200;
 const HOLD_PER_CHAR_MS = 70;
 const MAX_PARTICLES = 4200;
 const MAX_LINES = 3;
+/** Press-and-hold this long to charge the particles and start the game. */
+const CHARGE_MS = 1300;
+/** Presses shorter than this are clicks (morph), not charges. */
+const CLICK_MAX_MS = 350;
 const MONO_FONT = "ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace";
 
 interface Particle {
@@ -160,6 +165,7 @@ export function Intro() {
   const particlesRef = React.useRef<Particle[]>([]);
   const phraseIndexRef = React.useRef(0);
   const [phrase, setPhrase] = React.useState(intro.phrases[0]);
+  const [playing, setPlaying] = React.useState(false);
   const reduceMotion = useReducedMotion();
   const { resolvedTheme } = useTheme();
   const dark = resolvedTheme !== "light";
@@ -168,7 +174,9 @@ export function Intro() {
     const container = containerRef.current;
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    if (!container || !canvas || !ctx) return;
+    // While the game runs the particle scene sleeps; on exit this effect
+    // re-runs and the scattered particles fly back into the phrase.
+    if (!container || !canvas || !ctx || playing) return;
 
     const particles = particlesRef.current;
     const sprites = makeSprites(dark);
@@ -184,6 +192,12 @@ export function Intro() {
     let visible = true;
     let lastMorph = performance.now();
     let cancelled = false;
+    // Press-and-hold state.
+    const charge = { active: false, start: 0, x: 0, y: 0 };
+    let pressStart = 0;
+    let suppressClick = false;
+    let exploding = false;
+    let timer = 0;
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
@@ -197,6 +211,50 @@ export function Intro() {
       }
       ctx.globalAlpha = 1;
       ctx.globalCompositeOperation = "source-over";
+      drawChargeRing();
+    };
+
+    // Ring of light that fills up around the pointer while holding.
+    const drawChargeRing = () => {
+      if (!charge.active) return;
+      const p = Math.min(1, (performance.now() - charge.start) / CHARGE_MS);
+      if (p < 0.12) return;
+      const radius = 30 + Math.sin(performance.now() / 60) * p * 3;
+      ctx.lineCap = "round";
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = dark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.12)";
+      ctx.beginPath();
+      ctx.arc(charge.x, charge.y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.shadowColor = "#8b5cf6";
+      ctx.shadowBlur = 16;
+      ctx.strokeStyle = dark ? "#a78bfa" : "#6d28d9";
+      ctx.beginPath();
+      ctx.arc(
+        charge.x,
+        charge.y,
+        radius,
+        -Math.PI / 2,
+        -Math.PI / 2 + ((p - 0.12) / 0.88) * Math.PI * 2,
+      );
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    };
+
+    const explode = () => {
+      charge.active = false;
+      suppressClick = true;
+      exploding = true;
+      for (const p of particles) {
+        const dx = p.x - charge.x;
+        const dy = p.y - charge.y;
+        const d = Math.hypot(dx, dy) || 1;
+        const v = 18 + Math.random() * 30;
+        p.vx = (dx / d) * v;
+        p.vy = (dy / d) * v;
+        p.glow = 1;
+      }
+      timer = window.setTimeout(() => setPlaying(true), 480);
     };
 
     // Point every particle at a spot in the current word; leftovers drift
@@ -270,9 +328,30 @@ export function Intro() {
       const hold =
         HOLD_BASE_MS +
         intro.phrases[phraseIndexRef.current].text.length * HOLD_PER_CHAR_MS;
-      if (!pointer.active && now - lastMorph > hold) morph();
+      if (!pointer.active && !exploding && now - lastMorph > hold) morph();
+
+      const chargeLevel = charge.active
+        ? Math.min(1, (now - charge.start) / CHARGE_MS)
+        : 0;
+      if (chargeLevel >= 1) explode();
 
       for (const p of particles) {
+        if (exploding) {
+          // Free flight outward — no springs until the game takes over.
+          p.vx *= 0.96;
+          p.vy *= 0.96;
+          p.x += p.vx;
+          p.y += p.vy;
+          continue;
+        }
+        if (chargeLevel > 0.12) {
+          // Charging: get pulled toward the pointer and shake harder.
+          p.vx += (charge.x - p.x) * 0.0035 * chargeLevel;
+          p.vy += (charge.y - p.y) * 0.0035 * chargeLevel;
+          p.vx += (Math.random() - 0.5) * chargeLevel * 2;
+          p.vy += (Math.random() - 0.5) * chargeLevel * 2;
+          p.glow = Math.max(p.glow, chargeLevel * 0.8);
+        }
         if (p.dust) {
           p.tx += Math.cos(now * 0.0003 + p.seed) * 0.4;
           p.ty += Math.sin(now * 0.0004 + p.seed) * 0.4;
@@ -281,7 +360,7 @@ export function Intro() {
         p.vx += (p.tx - p.x) * spring;
         p.vy += (p.ty - p.y) * spring;
 
-        if (pointer.active) {
+        if (pointer.active && !charge.active) {
           const dx = p.x - pointer.x;
           const dy = p.y - pointer.y;
           const d2 = dx * dx + dy * dy;
@@ -330,12 +409,42 @@ export function Intro() {
       pointer.x = e.clientX - rect.left;
       pointer.y = e.clientY - rect.top;
       pointer.active = true;
+      if (charge.active) {
+        charge.x = pointer.x;
+        charge.y = pointer.y;
+      }
+    };
+    const endCharge = () => {
+      charge.active = false;
+      if (reduceMotion) window.clearTimeout(timer);
     };
     const onLeave = () => {
       pointer.active = false;
+      endCharge();
+    };
+    const onDown = (e: PointerEvent) => {
+      if (e.button !== 0 || (e.target as Element).closest("a, button")) return;
+      const rect = container.getBoundingClientRect();
+      pressStart = performance.now();
+      suppressClick = false;
+      Object.assign(charge, {
+        active: true,
+        start: pressStart,
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+      });
+      // No animation loop with reduced motion: just start after the hold.
+      if (reduceMotion) {
+        timer = window.setTimeout(() => {
+          suppressClick = true;
+          setPlaying(true);
+        }, CHARGE_MS);
+      }
     };
     const onClick = (e: MouseEvent) => {
       if ((e.target as Element).closest("a, button")) return;
+      if (suppressClick || performance.now() - pressStart > CLICK_MAX_MS)
+        return;
       const rect = container.getBoundingClientRect();
       morph(e.clientX - rect.left, e.clientY - rect.top);
     };
@@ -360,19 +469,26 @@ export function Intro() {
 
     container.addEventListener("pointermove", onMove);
     container.addEventListener("pointerleave", onLeave);
+    container.addEventListener("pointerdown", onDown);
+    container.addEventListener("pointerup", endCharge);
+    container.addEventListener("pointercancel", endCharge);
     container.addEventListener("click", onClick);
     start();
 
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
       stop();
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       container.removeEventListener("pointermove", onMove);
       container.removeEventListener("pointerleave", onLeave);
+      container.removeEventListener("pointerdown", onDown);
+      container.removeEventListener("pointerup", endCharge);
+      container.removeEventListener("pointercancel", endCharge);
       container.removeEventListener("click", onClick);
     };
-  }, [dark, reduceMotion]);
+  }, [dark, reduceMotion, playing]);
 
   return (
     <section
@@ -395,14 +511,18 @@ export function Intro() {
           ref={canvasRef}
           role="img"
           aria-label={`Glowing particles spelling “${phrase.text}”${phrase.by ? ` — ${phrase.by}` : ""}`}
-          className="h-full w-full"
+          className={`h-full w-full transition-opacity duration-700 ${playing ? "opacity-0" : "opacity-100"}`}
         />
       </div>
+
+      {playing ? (
+        <LightRunner dark={dark} onExit={() => setPlaying(false)} />
+      ) : null}
 
       {/* Quote author */}
       <div className="pointer-events-none absolute inset-x-0 bottom-[22%] flex justify-center px-6 md:bottom-[20%]">
         <AnimatePresence mode="wait">
-          {phrase.by ? (
+          {phrase.by && !playing ? (
             <motion.p
               key={phrase.text}
               initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
@@ -419,24 +539,28 @@ export function Intro() {
         </AnimatePresence>
       </div>
 
-      <p className="pointer-events-none absolute top-24 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-muted-foreground backdrop-blur">
-        <span className="size-1.5 rounded-full bg-brand shadow-[0_0_8px_2px_hsl(var(--brand))]" />
-        {intro.eyebrow}
-      </p>
+      {!playing ? (
+        <>
+          <p className="pointer-events-none absolute top-24 inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-4 py-1.5 text-xs font-medium uppercase tracking-widest text-muted-foreground backdrop-blur">
+            <span className="size-1.5 rounded-full bg-brand shadow-[0_0_8px_2px_hsl(var(--brand))]" />
+            {intro.eyebrow}
+          </p>
 
-      <div className="pointer-events-none absolute bottom-8 flex flex-col items-center gap-4 px-6 text-center">
-        <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-          <MousePointerClick className="size-4 text-brand" />
-          {intro.hint}
-        </p>
-        <Link
-          href={intro.cta.href}
-          className="pointer-events-auto inline-flex flex-col items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-brand"
-        >
-          {intro.cta.label}
-          <ArrowDown className="size-5 animate-bounce" />
-        </Link>
-      </div>
+          <div className="pointer-events-none absolute bottom-8 flex flex-col items-center gap-4 px-6 text-center">
+            <p className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+              <MousePointerClick className="size-4 text-brand" />
+              {intro.hint}
+            </p>
+            <Link
+              href={intro.cta.href}
+              className="pointer-events-auto inline-flex flex-col items-center gap-1 text-sm font-medium text-foreground/80 transition-colors hover:text-brand"
+            >
+              {intro.cta.label}
+              <ArrowDown className="size-5 animate-bounce" />
+            </Link>
+          </div>
+        </>
+      ) : null}
     </section>
   );
 }

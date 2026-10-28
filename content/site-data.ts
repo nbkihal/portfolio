@@ -191,7 +191,7 @@ export const intro = {
   /** Interactive particle intro shown before the hero. */
   eyebrow: "Interactive · made of light",
   phrases: introPhrases,
-  hint: "Move your cursor through the light · click to morph",
+  hint: "Move through the light · click to morph · hold to play",
   cta: { label: "Enter the portfolio", href: "/#top" } satisfies CTA,
 };
 
