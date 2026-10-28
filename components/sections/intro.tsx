@@ -505,7 +505,7 @@ export function Intro() {
 
       <div
         ref={containerRef}
-        className="absolute inset-0 touch-pan-y select-none"
+        className="absolute inset-0 touch-pan-y select-none [-webkit-touch-callout:none]"
       >
         <canvas
           ref={canvasRef}
