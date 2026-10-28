@@ -515,9 +515,7 @@ export function Intro() {
         />
       </div>
 
-      {playing ? (
-        <TypingTest onExit={() => setPlaying(false)} />
-      ) : null}
+      {playing ? <TypingTest onExit={() => setPlaying(false)} /> : null}
 
       {/* Quote author */}
       <div className="pointer-events-none absolute inset-x-0 bottom-[22%] flex justify-center px-6 md:bottom-[20%]">

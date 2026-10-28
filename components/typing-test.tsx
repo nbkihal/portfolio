@@ -15,7 +15,8 @@ import { cn } from "@/lib/utils";
 const WORD_COUNT = 15;
 const BEST_KEY = "typing-test-best-wpm";
 
-const WORDS = `the be to of and a in that have it for not on with he as you do at
+const WORDS =
+  `the be to of and a in that have it for not on with he as you do at
 this but his by from they we say her she or an will my one all would there their
 what so up out if about who get which go me when make can like time no just him
 know take people into year your good some could them see other than then now look
@@ -114,7 +115,8 @@ export function TypingTest({ onExit }: { onExit: () => void }) {
     return () => window.clearInterval(id);
   }, [startedAt, stats]);
 
-  const elapsed = startedAt === null ? 0 : ((stats ? 0 : now) - startedAt) / 1000;
+  const elapsed =
+    startedAt === null ? 0 : ((stats ? 0 : now) - startedAt) / 1000;
   const liveWpm =
     startedAt !== null && elapsed > 0.5
       ? Math.round(correctChars(words, typed, current) / 5 / (elapsed / 60))
@@ -407,7 +409,11 @@ export function TypingTest({ onExit }: { onExit: () => void }) {
             <motion.span
               aria-hidden
               className="pointer-events-none absolute left-0 top-0 w-[3px] rounded-full bg-gradient-to-b from-brand to-cyan shadow-[0_0_12px_hsl(var(--brand))]"
-              animate={{ x: caret.x - 1, y: caret.y + caret.h * 0.12, height: caret.h * 0.76 }}
+              animate={{
+                x: caret.x - 1,
+                y: caret.y + caret.h * 0.12,
+                height: caret.h * 0.76,
+              }}
               transition={{ type: "spring", stiffness: 700, damping: 40 }}
               style={{ opacity: focused ? 1 : 0 }}
             />
@@ -420,7 +426,9 @@ export function TypingTest({ onExit }: { onExit: () => void }) {
               </span>
             ) : null}
             <span>
-              <kbd className="rounded border px-1.5 py-0.5 font-mono">enter</kbd>{" "}
+              <kbd className="rounded border px-1.5 py-0.5 font-mono">
+                enter
+              </kbd>{" "}
               restart
             </span>
             <span>
@@ -448,7 +456,8 @@ function Results({
   const max = Math.max(...stats.samples, 10);
   const points = stats.samples
     .map((v, i) => {
-      const x = stats.samples.length > 1 ? (i / (stats.samples.length - 1)) * 100 : 50;
+      const x =
+        stats.samples.length > 1 ? (i / (stats.samples.length - 1)) * 100 : 50;
       return `${x},${40 - (v / max) * 36}`;
     })
     .join(" ");
@@ -477,7 +486,11 @@ function Results({
         </div>
 
         <div className="rounded-xl border bg-card/60 p-4 backdrop-blur">
-          <svg viewBox="0 0 100 42" className="h-32 w-full overflow-visible" preserveAspectRatio="none">
+          <svg
+            viewBox="0 0 100 42"
+            className="h-32 w-full overflow-visible"
+            preserveAspectRatio="none"
+          >
             <defs>
               <linearGradient id="wpm-line" x1="0" x2="1">
                 <stop offset="0" stopColor="hsl(var(--brand))" />
@@ -485,7 +498,15 @@ function Results({
               </linearGradient>
             </defs>
             {[10, 20, 30].map((y) => (
-              <line key={y} x1="0" x2="100" y1={y} y2={y} stroke="hsl(var(--border))" strokeWidth="0.3" />
+              <line
+                key={y}
+                x1="0"
+                x2="100"
+                y1={y}
+                y2={y}
+                stroke="hsl(var(--border))"
+                strokeWidth="0.3"
+              />
             ))}
             <polyline
               points={points}
@@ -531,7 +552,9 @@ function Results({
         >
           <RotateCcw className="size-4" />
           Next test
-          <kbd className="rounded bg-white/20 px-1.5 font-mono text-[10px]">enter</kbd>
+          <kbd className="rounded bg-white/20 px-1.5 font-mono text-[10px]">
+            enter
+          </kbd>
         </button>
         <button
           type="button"
