@@ -154,6 +154,21 @@
   .animate-border-spin {
     animation: border-spin 6s linear infinite;
   }
+
+  /* Light band that sweeps down the hero portrait every few seconds. */
+  .animate-scan {
+    animation: scan 5s ease-in-out infinite;
+  }
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-120%);
+  }
+  55%,
+  100% {
+    transform: translateY(420%);
+  }
 }
 
 /* Animatable angle for the rotating conic light around featured cards. */

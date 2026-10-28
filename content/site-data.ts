@@ -19,7 +19,14 @@ export type IconKey =
   | "workflow"
   | "mail"
   | "linkedin"
-  | "github";
+  | "github"
+  | "graduation"
+  | "palette"
+  | "users"
+  | "calendar"
+  | "flag"
+  | "rocket"
+  | "briefcase";
 
 export interface CTA {
   label: string;
@@ -58,6 +65,18 @@ export interface Project {
   };
 }
 
+/** One stop on the Parcours roadmap. */
+export interface Milestone {
+  /** Short label shown on the roadmap node (a year, a season, "Now"…). */
+  period: string;
+  title: string;
+  /** Where it happened — school, club, client… */
+  place: string;
+  description: string;
+  icon: IconKey;
+  tags?: string[];
+}
+
 export interface Testimonial {
   quote: string;
   name: string;
@@ -88,10 +107,11 @@ export const site = {
 /* ------------------------------------------------------------- navigation */
 
 export const navLinks: NavLink[] = [
-  { label: "About", href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Work", href: "#projects" },
-  { label: "Contact", href: "#contact" },
+  { label: "About", href: "/#about" },
+  { label: "Parcours", href: "/#parcours" },
+  { label: "Services", href: "/#services" },
+  { label: "Work", href: "/#projects" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 /* ------------------------------------------------------------------- intro */
@@ -105,7 +125,7 @@ export const intro = {
    */
   words: ["HELLO", "I BUILD", "WITH AI", "FOR YOU"],
   hint: "Move your cursor through the light · click to morph",
-  cta: { label: "Enter the portfolio", href: "#top" } satisfies CTA,
+  cta: { label: "Enter the portfolio", href: "/#top" } satisfies CTA,
 };
 
 /* -------------------------------------------------------------------- hero */
@@ -128,8 +148,15 @@ export const hero = {
   ],
   subheadline:
     "Software engineering student at ESI Algiers and freelance developer. From idea to production — fast.",
-  primaryCta: { label: "Start a Project", href: "#contact" } satisfies CTA,
-  secondaryCta: { label: "See My Work", href: "#projects" } satisfies CTA,
+  primaryCta: { label: "Start a Project", href: "/#contact" } satisfies CTA,
+  secondaryCta: { label: "See My Work", href: "/#projects" } satisfies CTA,
+  /** Tech chips that orbit the portrait. Keep to ~6 short labels. */
+  orbit: ["Next.js", "Python", "Django", "LLM agents", "Three.js", "Docker"],
+  /** Small floating badges pinned to the portrait. */
+  portraitBadges: {
+    top: "Software Engineering · ESI",
+    bottom: "Open to freelance",
+  },
   /** Square portrait served from /public. */
   photoSrc: "/kihal-ayoub.png",
   photoAlt: "Kihal Ayoub",
@@ -144,12 +171,108 @@ export const about = {
     "I've built AI-integrated tools, full-stack platforms, and multi-agent systems. I care about two things on every project: does it work flawlessly, and does it look like nothing else out there.",
   ],
   highlights: [
-    "ESI Algiers — Software Engineering",
-    "Freelance developer",
-    "AI & full-stack",
-    "From idea to production",
-  ],
+    {
+      label: "ESI Algiers",
+      detail: "Software Engineering",
+      icon: "graduation",
+    },
+    {
+      label: "Freelance",
+      detail: "Real clients, real deadlines",
+      icon: "briefcase",
+    },
+    {
+      label: "AI & full-stack",
+      detail: "LLM agents to deployed platforms",
+      icon: "sparkles",
+    },
+    {
+      label: "Idea → production",
+      detail: "Scoped, built, shipped",
+      icon: "rocket",
+    },
+  ] satisfies { label: string; detail: string; icon: IconKey }[],
 };
+
+/* ---------------------------------------------------------------- parcours */
+/*
+ * The roadmap, oldest first. `period` is free text — swap in real years
+ * (e.g. "2022", "2024 – 25") whenever you like.
+ */
+
+export const parcours: Milestone[] = [
+  {
+    period: "Start",
+    title: "Joined ESI Algiers",
+    place: "École Supérieure d'Informatique",
+    description:
+      "Started a software engineering degree at one of Algeria's top computer-science schools — algorithms, systems, and a lot of late-night debugging.",
+    icon: "graduation",
+    tags: ["Software Engineering"],
+  },
+  {
+    period: "CSE",
+    title: "Design Department",
+    place: "Club Scientifique de l'ESI",
+    description:
+      "Joined the school's scientific club on the design team — visuals, identity, and the habit of making things look like nothing else.",
+    icon: "palette",
+    tags: ["Design", "Branding"],
+  },
+  {
+    period: "Builds",
+    title: "First real products",
+    place: "Team & personal projects",
+    description:
+      "Shipped Traveleo, a Dockerized Django travel platform, and Refactoring Swarm, a four-agent LLM system that refactors Python codebases on its own.",
+    icon: "code",
+    tags: ["Django", "Docker", "LangChain", "Gemini"],
+  },
+  {
+    period: "CSE",
+    title: "Responsable RH",
+    place: "Club Scientifique de l'ESI",
+    description:
+      "Moved into leading human resources for the club — recruiting, onboarding, and keeping a large volunteer team running.",
+    icon: "users",
+    tags: ["Leadership", "HR"],
+  },
+  {
+    period: "Freelance",
+    title: "Client work",
+    place: "Freelance developer",
+    description:
+      "Delivered SVG org charts for RAHBARAAN's formal tender documents and built a commercial-ready AI CV generator for the Algerian market.",
+    icon: "briefcase",
+    tags: ["Clients", "Anthropic API", "SVG"],
+  },
+  {
+    period: "CSE",
+    title: "Lead Event",
+    place: "Club Scientifique de l'ESI",
+    description:
+      "Led the club's events — including Data Hack 2k26, for which I also built the Discord bot that ran the competition.",
+    icon: "calendar",
+    tags: ["Events", "Discord bot"],
+  },
+  {
+    period: "2026 / 27",
+    title: "Running for CSE President",
+    place: "Club Scientifique de l'ESI",
+    description:
+      "Ran for president of the club with a full reform platform built on club diagnostics and internal restructuring.",
+    icon: "flag",
+    tags: ["Leadership", "Strategy"],
+  },
+  {
+    period: "Next",
+    title: "Your project",
+    place: "Let's build it together",
+    description:
+      "The next stop on the roadmap is the one we build together. Tell me what you want to ship.",
+    icon: "rocket",
+  },
+];
 
 /* ---------------------------------------------------------------- services */
 
@@ -158,25 +281,25 @@ export const services: Service[] = [
     title: "Full-Stack Web Development",
     description: "From database design to deployed product.",
     icon: "code",
-    cta: { label: "Get a quote", href: "#contact" },
+    cta: { label: "Get a quote", href: "/#contact" },
   },
   {
     title: "AI-Integrated Products",
     description: "LLM-powered tools, automation, and intelligent features.",
     icon: "sparkles",
-    cta: { label: "Get a quote", href: "#contact" },
+    cta: { label: "Get a quote", href: "/#contact" },
   },
   {
     title: "Landing Pages & Business Sites",
     description: "Fast, conversion-focused, on-brand.",
     icon: "layout",
-    cta: { label: "Get a quote", href: "#contact" },
+    cta: { label: "Get a quote", href: "/#contact" },
   },
   {
     title: "Data & Automation Scripts",
     description: "Cleanup, validation, and processing pipelines.",
     icon: "workflow",
-    cta: { label: "Get a quote", href: "#contact" },
+    cta: { label: "Get a quote", href: "/#contact" },
   },
 ];
 

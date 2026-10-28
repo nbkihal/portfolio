@@ -1,11 +1,12 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowRight, ArrowDown } from "lucide-react";
 
 import { hero } from "@/content/site-data";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/reveal";
 import { HeroGlobe } from "@/components/hero-globe";
+import { HeroPortrait } from "@/components/hero-portrait";
+import { Typewriter } from "@/components/typewriter";
 
 export function Hero() {
   return (
@@ -35,7 +36,11 @@ export function Hero() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <p className="mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
+              <Typewriter
+                lines={hero.taglines}
+                className="mt-6 min-h-[4.5rem] max-w-2xl font-display text-xl font-medium leading-snug text-foreground md:min-h-[5rem] md:text-2xl"
+              />
+              <p className="mt-4 max-w-2xl border-l-2 border-brand/60 pl-4 text-base text-muted-foreground md:text-lg">
                 {hero.subheadline}
               </p>
             </Reveal>
@@ -58,23 +63,12 @@ export function Hero() {
           </div>
 
           <Reveal delay={0.2} className="order-first lg:order-none">
-            <div className="relative mx-auto aspect-square w-full max-w-xs sm:max-w-sm lg:ml-auto lg:max-w-md">
-              {/* Soft brand halo to lift the portrait off the globe */}
-              <div
-                aria-hidden="true"
-                className="absolute -inset-4 -z-10 rounded-[2rem] bg-brand/20 blur-2xl"
-              />
-              <div className="relative h-full w-full overflow-hidden rounded-full border border-border bg-card shadow-2xl glow-brand">
-                <Image
-                  src={hero.photoSrc}
-                  alt={hero.photoAlt}
-                  fill
-                  priority
-                  sizes="(min-width: 1024px) 28rem, (min-width: 640px) 24rem, 80vw"
-                  className="object-cover"
-                />
-              </div>
-            </div>
+            <HeroPortrait
+              src={hero.photoSrc}
+              alt={hero.photoAlt}
+              orbit={hero.orbit}
+              badges={hero.portraitBadges}
+            />
           </Reveal>
         </div>
       </div>

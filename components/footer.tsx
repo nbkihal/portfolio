@@ -10,7 +10,7 @@ export function Footer() {
     <footer className="border-t border-border/60">
       <div className="container flex flex-col gap-8 py-12 md:flex-row md:items-start md:justify-between">
         <div className="max-w-xs">
-          <Link href="#top" className="font-display text-lg font-bold">
+          <Link href="/" className="font-display text-lg font-bold">
             {site.name}
             <span className="text-brand">.</span>
           </Link>

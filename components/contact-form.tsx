@@ -63,7 +63,7 @@ export function ContactForm() {
 
   if (status === "success") {
     return (
-      <div className="flex h-full min-h-[20rem] flex-col items-center justify-center gap-4 rounded-2xl border bg-card p-8 text-center">
+      <div className="flex h-full min-h-[20rem] flex-col items-center justify-center gap-4 p-8 text-center">
         <div className="flex size-14 items-center justify-center rounded-full bg-brand/10 text-brand">
           <CheckCircle2 className="size-7" />
         </div>
@@ -81,7 +81,7 @@ export function ContactForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-5 rounded-2xl border bg-card p-6 sm:p-8"
+      className="flex flex-col gap-5 p-6 sm:p-8"
     >
       <div className="flex flex-col gap-2">
         <Label htmlFor="name">Name</Label>

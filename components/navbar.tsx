@@ -39,7 +39,7 @@ export function Navbar() {
     >
       <nav className="container flex h-16 items-center justify-between">
         <Link
-          href="#top"
+          href="/"
           className="font-display text-lg font-bold tracking-tight"
           onClick={() => setOpen(false)}
         >
