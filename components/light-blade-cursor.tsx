@@ -90,8 +90,16 @@ export function LightBladeCursor() {
 
     const trail: TrailPoint[] = [];
     const rings: Array<{ x: number; y: number; t: number }> = [];
-    const pointer = { x: -100, y: -100, inside: false, hover: false };
+    const pointer = {
+      x: -100,
+      y: -100,
+      inside: false,
+      hover: false,
+      down: false,
+    };
     const head = { x: -100, y: -100 };
+    // The ring around the ball trails it slightly, like a loose halo.
+    const halo = { x: -100, y: -100, r: 13 };
     const prevHead = { x: -100, y: -100 };
     let motion = 0;
     let width = 0;
@@ -118,6 +126,9 @@ export function LightBladeCursor() {
       const k = 1 - Math.exp(-dt * FOLLOW);
       head.x += (pointer.x - head.x) * k;
       head.y += (pointer.y - head.y) * k;
+      const kHalo = 1 - Math.exp(-dt * FOLLOW * 0.45);
+      halo.x += (head.x - halo.x) * kHalo;
+      halo.y += (head.y - halo.y) * kHalo;
       energy += ((pointer.hover ? 1 : 0) - energy) * (1 - Math.exp(-dt * 10));
       // 0 at rest → 1 when moving fast; shrinks and dims the tip in motion.
       const speed =
@@ -212,6 +223,36 @@ export function LightBladeCursor() {
         ctx.arc(head.x, head.y, r, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalAlpha = 1;
+
+        // Ring around the ball: grows over clickable things, squeezes
+        // while pressed.
+        const target = (13 + energy * 7) * (pointer.down ? 0.75 : 1);
+        halo.r += (target - halo.r) * (1 - Math.exp(-dt * 14));
+        const ring = ctx.createLinearGradient(
+          halo.x - halo.r,
+          halo.y - halo.r,
+          halo.x + halo.r,
+          halo.y + halo.r,
+        );
+        ring.addColorStop(
+          0,
+          dark ? "rgba(186,230,253,0.75)" : "rgba(2,132,199,0.75)",
+        );
+        ring.addColorStop(
+          1,
+          dark ? "rgba(99,102,241,0.55)" : "rgba(79,70,229,0.6)",
+        );
+        ctx.strokeStyle = ring;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.arc(halo.x, halo.y, halo.r, 0, Math.PI * 2);
+        ctx.stroke();
+        if (energy > 0.01) {
+          ctx.fillStyle = dark
+            ? `rgba(56,189,248,${0.08 * energy})`
+            : `rgba(14,165,233,${0.08 * energy})`;
+          ctx.fill();
+        }
       }
       ctx.globalCompositeOperation = "source-over";
 
@@ -232,8 +273,8 @@ export function LightBladeCursor() {
     const onMove = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       if (!pointer.inside) {
-        head.x = prevHead.x = e.clientX;
-        head.y = prevHead.y = e.clientY;
+        head.x = prevHead.x = halo.x = e.clientX;
+        head.y = prevHead.y = halo.y = e.clientY;
       }
       pointer.x = e.clientX;
       pointer.y = e.clientY;
@@ -248,7 +289,11 @@ export function LightBladeCursor() {
     const onDown = (e: PointerEvent) => {
       if (e.pointerType !== "mouse") return;
       rings.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+      pointer.down = true;
       wake();
+    };
+    const onUp = () => {
+      pointer.down = false;
     };
     const onLeave = () => {
       pointer.inside = false;
@@ -259,6 +304,7 @@ export function LightBladeCursor() {
     window.addEventListener("pointermove", onMove);
     window.addEventListener("pointerover", onOver);
     window.addEventListener("pointerdown", onDown);
+    window.addEventListener("pointerup", onUp);
     root.addEventListener("pointerleave", onLeave);
 
     return () => {
@@ -268,6 +314,7 @@ export function LightBladeCursor() {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerover", onOver);
       window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
       root.removeEventListener("pointerleave", onLeave);
     };
   }, [enabled, dark]);
