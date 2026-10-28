@@ -87,6 +87,7 @@ export function ProjectsExplorer() {
             <motion.li
               key={project.id}
               layout
+              className="min-w-0"
               initial={{ opacity: 0, scale: 0.92, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92 }}

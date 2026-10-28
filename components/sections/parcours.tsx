@@ -44,7 +44,7 @@ export function Parcours() {
   });
 
   return (
-    <Section id="parcours" className="relative">
+    <Section id="parcours" className="relative overflow-x-clip">
       <div className="container">
         <SectionHeading
           eyebrow="Parcours"

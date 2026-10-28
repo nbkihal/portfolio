@@ -37,7 +37,7 @@ export function Projects() {
             <Reveal
               key={project.id}
               delay={(i % 3) * 0.08}
-              className={sizeClasses[project.size]}
+              className={`min-w-0 ${sizeClasses[project.size]}`}
             >
               <ProjectCard project={project} index={i} />
             </Reveal>
