@@ -15,7 +15,6 @@ import { projects } from "@/content/site-data";
 import { AmbientLights } from "@/components/ambient-lights";
 import { LightCard } from "@/components/light-card";
 import { Reveal } from "@/components/reveal";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 interface ProjectPageProps {
@@ -60,7 +59,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   return (
     <article className="relative overflow-hidden">
       <AmbientLights />
-      <div aria-hidden className="bg-dotted absolute inset-x-0 top-0 h-[36rem] opacity-50 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+      <div
+        aria-hidden
+        className="bg-dotted absolute inset-x-0 top-0 h-[36rem] opacity-50 [mask-image:linear-gradient(to_bottom,black,transparent)]"
+      />
 
       {/* ------------------------------------------------------------ header */}
       <header className="container relative pb-16 pt-32 md:pb-20 md:pt-40">
@@ -147,7 +149,10 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               </p>
               <ul className="mt-4 flex flex-col gap-3">
                 {project.tech.map((tech) => (
-                  <li key={tech} className="flex items-center gap-3 font-medium">
+                  <li
+                    key={tech}
+                    className="flex items-center gap-3 font-medium"
+                  >
                     <span className="size-2 rounded-full bg-cyan shadow-[0_0_8px_2px_hsl(var(--cyan)/0.7)]" />
                     {tech}
                   </li>
@@ -174,8 +179,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               const Icon = step.icon;
               return (
                 <li key={step.label} className="relative pl-16 md:pl-20">
-                  <Reveal delay={i * 0.08}>
-                    <span className="absolute left-0 top-6 flex size-12 items-center justify-center rounded-full bg-gradient-to-br from-brand to-cyan text-white shadow-[0_0_24px_4px_hsl(var(--brand)/0.5)] md:size-14">
+                  <Reveal delay={i * 0.08} className="relative">
+                    <span className="absolute -left-16 top-6 flex size-12 items-center justify-center rounded-full bg-gradient-to-br from-brand to-cyan text-white shadow-[0_0_24px_4px_hsl(var(--brand)/0.5)] md:-left-20 md:size-14">
                       <Icon className="size-5 md:size-6" />
                     </span>
                     <LightCard tilt={3} className="p-6 sm:p-8">
@@ -233,8 +238,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               Have a project like this in mind?
             </h2>
             <p className="max-w-xl text-muted-foreground">
-              Tell me what you&apos;re trying to ship and I&apos;ll get back to you with
-              a plan.
+              Tell me what you&apos;re trying to ship and I&apos;ll get back to
+              you with a plan.
             </p>
             <Button asChild size="lg">
               <Link href="/#contact">

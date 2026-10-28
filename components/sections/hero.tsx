@@ -14,7 +14,6 @@ export function Hero() {
       id="top"
       className="relative flex min-h-[100svh] items-center overflow-hidden"
     >
-
       <div className="container relative py-28">
         <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
           <div className="max-w-2xl">

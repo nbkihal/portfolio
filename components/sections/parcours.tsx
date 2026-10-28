@@ -121,7 +121,11 @@ function MilestoneRow({
   const p = useSpring(scrollYProgress, { stiffness: 160, damping: 26 });
 
   const cardOpacity = useTransform(p, [0, 1], [0.25, 1]);
-  const cardX = useTransform(p, [0, 1], [reduceMotion ? 0 : left ? -48 : 48, 0]);
+  const cardX = useTransform(
+    p,
+    [0, 1],
+    [reduceMotion ? 0 : left ? -48 : 48, 0],
+  );
   const cardScale = useTransform(p, [0, 1], [reduceMotion ? 1 : 0.94, 1]);
   const Icon = icons[milestone.icon];
 

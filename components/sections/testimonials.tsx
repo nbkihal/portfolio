@@ -21,7 +21,11 @@ export function Testimonials() {
         {hasTestimonials ? (
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {testimonials.map((t, i) => (
-              <Reveal key={`${t.name}-${i}`} delay={i * 0.08} className="h-full">
+              <Reveal
+                key={`${t.name}-${i}`}
+                delay={i * 0.08}
+                className="h-full"
+              >
                 <LightCard className="flex h-full flex-col gap-4 p-6">
                   <MessageSquareQuote className="size-6 text-brand" />
                   <blockquote className="flex-1 text-lg leading-relaxed">

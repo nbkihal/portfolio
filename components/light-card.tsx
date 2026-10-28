@@ -10,7 +10,8 @@ import {
 
 import { cn } from "@/lib/utils";
 
-interface LightCardProps extends HTMLMotionProps<"div"> {
+interface LightCardProps extends Omit<HTMLMotionProps<"div">, "children"> {
+  children?: React.ReactNode;
   /** Max tilt toward the pointer, in degrees. 0 disables the tilt. */
   tilt?: number;
   /** Rotating beam of light travelling around the card's edge. */

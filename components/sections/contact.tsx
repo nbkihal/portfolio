@@ -26,29 +26,31 @@ export function Contact() {
                   return (
                     <li key={social.label}>
                       <LightCard tilt={3}>
-                      <a
-                        href={social.href}
-                        target={
-                          social.href.startsWith("http") ? "_blank" : undefined
-                        }
-                        rel={
-                          social.href.startsWith("http")
-                            ? "noopener noreferrer"
-                            : undefined
-                        }
-                        className="flex items-center gap-4 p-4"
-                      >
-                        <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-brand-foreground">
-                          <Icon className="size-5" />
-                        </span>
-                        <span className="flex flex-col">
-                          <span className="text-sm text-muted-foreground">
-                            {social.label}
+                        <a
+                          href={social.href}
+                          target={
+                            social.href.startsWith("http")
+                              ? "_blank"
+                              : undefined
+                          }
+                          rel={
+                            social.href.startsWith("http")
+                              ? "noopener noreferrer"
+                              : undefined
+                          }
+                          className="flex items-center gap-4 p-4"
+                        >
+                          <span className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand transition-colors group-hover:bg-brand group-hover:text-brand-foreground">
+                            <Icon className="size-5" />
                           </span>
-                          <span className="font-medium">{social.handle}</span>
-                        </span>
-                        <ArrowUpRight className="ml-auto size-5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
-                      </a>
+                          <span className="flex flex-col">
+                            <span className="text-sm text-muted-foreground">
+                              {social.label}
+                            </span>
+                            <span className="font-medium">{social.handle}</span>
+                          </span>
+                          <ArrowUpRight className="ml-auto size-5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-foreground" />
+                        </a>
                       </LightCard>
                     </li>
                   );
