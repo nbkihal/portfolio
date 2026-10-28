@@ -195,6 +195,7 @@ export function LightRunner({
           soft: "#c4b5fd",
           bg: "#0c0911",
           tint: "rgba(34,211,238,0.14)",
+          wing: "rgba(139,92,246,0.22)",
         }
       : {
           a: "#6d28d9",
@@ -203,6 +204,7 @@ export function LightRunner({
           soft: "#7c3aed",
           bg: "#ffffff",
           tint: "rgba(8,145,178,0.12)",
+          wing: "rgba(109,40,217,0.14)",
         };
 
     // Geometry, recomputed on resize. `u` is the size unit everything
@@ -371,10 +373,10 @@ export function LightRunner({
 
     // ---------------------------------------------------------- obstacles
     const spawn = () => {
-      const canFly = g.score > 150;
-      if (canFly && Math.random() < 0.3) {
-        const w = u * 0.11;
-        const h = u * 0.06;
+      const canFly = g.score > -1; // TEMP-TEST
+      if (canFly && Math.random() < 0.95) {
+        const w = u * 0.12;
+        const h = u * 0.07;
         const altitude = [
           ground - u * 0.012 - h, // low: jump over
           ground - r * 1.2 - h, // mid: duck under
@@ -468,14 +470,14 @@ export function LightRunner({
       if (Math.sin(seed * 3.1) > -0.5) {
         const ly = ground - h * (0.38 + ((seed * 7) % 1) * 0.12);
         arms.moveTo(cx, ly);
-        arms.lineTo(cx - w * 0.36, ly);
-        arms.lineTo(cx - w * 0.36, ly - h * 0.24);
+        arms.lineTo(cx - w * 0.42, ly);
+        arms.lineTo(cx - w * 0.42, ly - h * 0.26);
       }
       if (Math.cos(seed * 2.3) > -0.3) {
         const ry = ground - h * (0.52 + ((seed * 5) % 1) * 0.12);
         arms.moveTo(cx, ry);
-        arms.lineTo(cx + w * 0.36, ry);
-        arms.lineTo(cx + w * 0.36, ry - h * 0.2);
+        arms.lineTo(cx + w * 0.42, ry);
+        arms.lineTo(cx + w * 0.42, ry - h * 0.24);
       }
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
@@ -506,54 +508,84 @@ export function LightRunner({
       ctx.globalAlpha = 1;
     };
 
+    // Line-art pterosaur facing the player: crested head, long beak and
+    // membrane wings that sweep from high above the body to just below it.
     const drawDino = (o: Obstacle) => {
-      const cx = o.x + o.w / 2;
-      const cy = o.y + o.h / 2;
       const { w, h } = o;
-      const flap = Math.sin(g.t * 11 + o.seed);
+      const cx = o.x + w * 0.55;
+      const cy = o.y + h * 0.6;
+      const f = (Math.sin(g.t * 9 + o.seed) + 1) / 2; // 0 = down, 1 = up
+      const tipY = cy - h * 0.95 * f + h * 0.45 * (1 - f);
+      const tipX = cx + w * 0.02;
       ctx.lineJoin = "round";
       ctx.lineCap = "round";
+      ctx.lineWidth = Math.max(2, u * 0.005);
+
+      const wing = (dx: number, alpha: number) => {
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.moveTo(cx - w * 0.05, cy - h * 0.04);
+        ctx.quadraticCurveTo(
+          cx - w * 0.16 + dx,
+          (cy + tipY) / 2,
+          tipX + dx,
+          tipY,
+        );
+        ctx.quadraticCurveTo(
+          cx + w * 0.22 + dx,
+          (cy + tipY) / 2,
+          cx + w * 0.16,
+          cy + h * 0.02,
+        );
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      };
+
       ctx.strokeStyle = C.a;
-      ctx.fillStyle = dark ? "rgba(139,92,246,0.18)" : "rgba(109,40,217,0.12)";
+      ctx.fillStyle = C.wing;
       glow(C.a, 14);
-      ctx.lineWidth = Math.max(2, u * 0.006);
-      // Wings (flapping)
+      wing(w * 0.08, 0.45); // far wing
+      ctx.globalAlpha = 1;
+
+      // Body and tail
       ctx.beginPath();
-      ctx.moveTo(cx - w * 0.12, cy);
-      ctx.lineTo(cx + w * 0.05, cy - h * 1.15 * flap);
-      ctx.lineTo(cx + w * 0.32, cy + h * 0.05);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-      // Body + tail
-      ctx.beginPath();
-      ctx.ellipse(cx, cy + h * 0.05, w * 0.22, h * 0.2, 0, 0, Math.PI * 2);
+      ctx.ellipse(cx, cy, w * 0.17, h * 0.13, -0.08, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(cx + w * 0.2, cy + h * 0.05);
-      ctx.lineTo(cx + w * 0.5, cy + h * 0.15);
+      ctx.moveTo(cx + w * 0.16, cy + h * 0.02);
+      ctx.lineTo(cx + w * 0.34, cy + h * 0.08);
       ctx.stroke();
-      // Neck, head, beak and crest
+
+      // Head: neck, long beak, lower jaw, crest
       ctx.strokeStyle = C.b;
       glow(C.b, 12);
       ctx.beginPath();
-      ctx.moveTo(cx - w * 0.2, cy);
-      ctx.lineTo(cx - w * 0.34, cy - h * 0.25);
-      ctx.lineTo(cx - w * 0.56, cy - h * 0.1);
-      ctx.moveTo(cx - w * 0.34, cy - h * 0.25);
-      ctx.lineTo(cx - w * 0.2, cy - h * 0.55);
+      ctx.moveTo(cx - w * 0.14, cy - h * 0.03);
+      ctx.lineTo(cx - w * 0.28, cy - h * 0.16);
+      ctx.lineTo(cx - w * 0.58, cy - h * 0.05);
+      ctx.lineTo(cx - w * 0.3, cy - h * 0.04);
+      ctx.moveTo(cx - w * 0.28, cy - h * 0.16);
+      ctx.lineTo(cx - w * 0.12, cy - h * 0.42);
       ctx.stroke();
       ctx.fillStyle = C.core;
       ctx.beginPath();
       ctx.arc(
-        cx - w * 0.33,
-        cy - h * 0.2,
+        cx - w * 0.27,
+        cy - h * 0.11,
         Math.max(1.5, u * 0.004),
         0,
         Math.PI * 2,
       );
       ctx.fill();
+
+      // Near wing on top
+      ctx.strokeStyle = C.a;
+      ctx.fillStyle = C.wing;
+      glow(C.a, 14);
+      wing(0, 1);
+      ctx.globalAlpha = 1;
     };
 
     const drawPlayer = () => {

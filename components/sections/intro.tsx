@@ -346,8 +346,8 @@ export function Intro() {
         }
         if (chargeLevel > 0.12) {
           // Charging: get pulled toward the pointer and shake harder.
-          p.vx += (charge.x - p.x) * 0.0035 * chargeLevel;
-          p.vy += (charge.y - p.y) * 0.0035 * chargeLevel;
+          p.vx += (charge.x - p.x) * 0.007 * chargeLevel;
+          p.vy += (charge.y - p.y) * 0.007 * chargeLevel;
           p.vx += (Math.random() - 0.5) * chargeLevel * 2;
           p.vy += (Math.random() - 0.5) * chargeLevel * 2;
           p.glow = Math.max(p.glow, chargeLevel * 0.8);
