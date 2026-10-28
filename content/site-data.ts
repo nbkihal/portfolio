@@ -26,7 +26,9 @@ export type IconKey =
   | "calendar"
   | "flag"
   | "rocket"
-  | "briefcase";
+  | "briefcase"
+  | "medical"
+  | "clock";
 
 export interface CTA {
   label: string;
@@ -245,15 +247,6 @@ export const parcours: Milestone[] = [
     tags: ["Software Engineering"],
   },
   {
-    period: "CSE",
-    title: "Design Department",
-    place: "Club Scientifique de l'ESI",
-    description:
-      "Joined the school's scientific club on the design team — visuals, identity, and the habit of making things look like nothing else.",
-    icon: "palette",
-    tags: ["Design", "Branding"],
-  },
-  {
     period: "Builds",
     title: "First real products",
     place: "Team & personal projects",
@@ -267,36 +260,36 @@ export const parcours: Milestone[] = [
     title: "Responsable RH",
     place: "Club Scientifique de l'ESI",
     description:
-      "Moved into leading human resources for the club — recruiting, onboarding, and keeping a large volunteer team running.",
+      "Led human resources for the school's scientific club — recruiting new members, onboarding them, and keeping a large volunteer team motivated and organised.",
     icon: "users",
-    tags: ["Leadership", "HR"],
+    tags: ["HR", "Recruiting", "Leadership"],
   },
   {
     period: "Freelance",
     title: "Client work",
     place: "Freelance developer",
     description:
-      "Delivered SVG org charts for RAHBARAAN's formal tender documents and built a commercial-ready AI CV generator for the Algerian market.",
+      "SVG org charts for RAHBARAAN's tender documents, a commercial-ready AI CV generator, and a live registration portal for a Quranic school.",
     icon: "briefcase",
-    tags: ["Clients", "Anthropic API", "SVG"],
+    tags: ["Clients", "Anthropic API", "Supabase"],
   },
   {
-    period: "CSE",
-    title: "Lead Event",
-    place: "Club Scientifique de l'ESI",
+    period: "Internship",
+    title: "Medical documents, rebuilt",
+    place: "4th-year ESI internship",
     description:
-      "Led the club's events — including Data Hack 2k26, for which I also built the Discord bot that ran the competition.",
-    icon: "calendar",
-    tags: ["Events", "Discord bot"],
+      "Built the front-end that reconstructs medical documents from API data — layout, tables, images — and generates the final PDF on demand for web and mobile.",
+    icon: "medical",
+    tags: ["React", "TypeScript", "pdf-lib"],
   },
   {
-    period: "2026 / 27",
-    title: "Running for CSE President",
-    place: "Club Scientifique de l'ESI",
+    period: "Wecan",
+    title: "Staff Pro v2",
+    place: "Wecan Services",
     description:
-      "Ran for president of the club with a full reform platform built on club diagnostics and internal restructuring.",
-    icon: "flag",
-    tags: ["Leadership", "Strategy"],
+      "Leading the secure rebuild of a multi-company HR attendance app used in production — web, Android and iOS — without disrupting its current users.",
+    icon: "clock",
+    tags: ["Firebase", "SaaS", "PWA"],
   },
   {
     period: "Next",
@@ -342,20 +335,19 @@ export const services: Service[] = [
 
 export const projects: Project[] = [
   {
-    id: "traveleo",
-    title: "Traveleo — Travel Agency Platform",
+    id: "staff-pro",
+    title: "Staff Pro v2 — HR Attendance SaaS",
     description:
-      "Full-stack travel agency platform with a Django backend and a Dockerized deployment — built as a real product simulation, not a toy app.",
-    tech: ["Django", "Python", "JavaScript", "Docker"],
-    githubUrl: "https://github.com/Dali-MDB/Traveleo",
+      "Secure rebuild of WeCheckin, a multi-company HR attendance platform in production — employee app on web, Android and iOS, plus HR and SaaS admin consoles.",
+    tech: ["JavaScript", "Firebase", "Vite", "PWA", "Vitest"],
     size: "lg",
     caseStudy: {
       problem:
-        "A travel agency needs more than a brochure site — it needs real data models, working flows, and a deployment story a team can actually run.",
+        "A production HR app that companies rely on every day for clock-ins, schedules, overtime and payroll had grown hard to maintain and needed hardening — without any downtime for its users.",
       build:
-        "Built collaboratively as a full-stack product: a Django/Python backend powering the core logic and data, a JavaScript frontend, all containerized with Docker for reproducible environments.",
+        "A parallel v2 for Wecan Services: code split by page and role (employee PWA, HR console, SaaS console for client companies), geofenced clock-in zones, business rules for schedules, overtime and payroll covered by unit tests, an AI voice-call module, and a separate staging Firebase project with anonymised data.",
       outcome:
-        "A working, Dockerized platform delivered as a realistic product simulation rather than a class toy — deployable and team-runnable from a single setup.",
+        "Every legacy function is tracked by an inventory check and compared against the live version's behaviour, so the rebuild can go to production once validated, with no surprises for current users.",
     },
   },
   {
@@ -376,6 +368,73 @@ export const projects: Project[] = [
     },
   },
   {
+    id: "logic",
+    title: "Logic — Circuit Puzzle Game",
+    description:
+      "Educational Boolean-logic puzzle game: drag gates onto a board, wire them up and match a target truth table — 63 stages, from a NOT gate to a tiny ALU.",
+    tech: ["Flutter", "Dart"],
+    githubUrl: "https://github.com/nbkihal/Logic",
+    size: "md",
+    caseStudy: {
+      problem:
+        "Digital logic is usually taught with static diagrams. Students learn faster when they can build circuits themselves and see them work or fail right away.",
+      build:
+        "A Flutter app on one codebase for Android, iOS and Web: a circuit simulation engine kept separate from the UI, a canvas where you place, move and wire gates with undo, a live truth-table tester, sound, saved progress and scoring.",
+      outcome:
+        "Sixty-three stages in eleven chapters — universality from NAND and NOR, everyday wiring puzzles, decoders, arithmetic, black boxes to reverse-engineer and gate-budget challenges — fully playable.",
+    },
+  },
+  {
+    id: "medical-documents",
+    title: "Medical Document Reconstruction",
+    description:
+      "Internship front-end that rebuilds medical documents from API data — text, tables, images and shapes — and generates the final PDF on demand for web and mobile.",
+    tech: ["React", "TypeScript", "pdf-lib", "Tailwind CSS", "Vitest"],
+    size: "md",
+    caseStudy: {
+      problem:
+        "A digital medical platform extracts and translates documents through separate services. Someone has to turn that structured data back into a faithful, readable document.",
+      build:
+        "During my 4th-year ESI internship, I built a React + TypeScript front-end that reads the document structure from an external API and rebuilds each page — text, tables, images and shapes — keeping the original layout, then generates the PDF with pdf-lib.",
+      outcome:
+        "Documents are never stored on a server: each one is generated on demand for preview or download, on web and mobile, and stamped with its generation time and source document.",
+    },
+  },
+  {
+    id: "quran-school-portal",
+    title: "Quranic School — Registration Portal",
+    description:
+      "Arabic, right-to-left website and online registration for a mosque's Quranic school, backed by Supabase with locked-down access rules.",
+    tech: ["HTML", "CSS", "JavaScript", "Supabase"],
+    liveUrl: "https://mosque-registration-portail.vercel.app",
+    size: "md",
+    caseStudy: {
+      problem:
+        "A mosque's Quranic school was handling registrations on paper and needed a simple, trustworthy way for families to sign up online, in Arabic.",
+      build:
+        "A fully right-to-left site presenting the school and its classes, with a registration form that saves submissions and uploaded files to Supabase. Access rules let visitors submit, but never read, other people's data.",
+      outcome:
+        "Live on Vercel. Registration can be opened or closed for each season without any code changes.",
+    },
+  },
+  {
+    id: "traveleo",
+    title: "Traveleo — Travel Agency Platform",
+    description:
+      "Full-stack travel agency platform with a Django backend and a Dockerized deployment — built as a real product simulation, not a toy app.",
+    tech: ["Django", "Python", "JavaScript", "Docker"],
+    githubUrl: "https://github.com/Dali-MDB/Traveleo",
+    size: "lg",
+    caseStudy: {
+      problem:
+        "A travel agency needs more than a brochure site — it needs real data models, working flows, and a deployment story a team can actually run.",
+      build:
+        "Built collaboratively as a full-stack product: a Django/Python backend powering the core logic and data, a JavaScript frontend, all containerized with Docker for reproducible environments.",
+      outcome:
+        "A working, Dockerized platform delivered as a realistic product simulation rather than a class toy — deployable and team-runnable from a single setup.",
+    },
+  },
+  {
     id: "ai-cv-generator",
     title: "AI-Powered CV Generator",
     description:
@@ -389,6 +448,23 @@ export const projects: Project[] = [
         "A commercial-ready static site integrating the Anthropic API to generate tailored CVs on demand, with localized DZD pricing and a real monetization roadmap.",
       outcome:
         "A ship-ready product aimed at a specific market, with pricing and monetization designed in from the start rather than bolted on.",
+    },
+  },
+  {
+    id: "2048-stages",
+    title: "2048 Stages — Mobile Puzzle Game",
+    description:
+      "A reworked take on 2048 in Flutter: stage-based progression, an endless mode, daily challenges, unlockable skins, medals and a bold poster-style design.",
+    tech: ["Flutter", "Dart"],
+    githubUrl: "https://github.com/nbkihal/2048-game",
+    size: "md",
+    caseStudy: {
+      problem:
+        "Classic 2048 is fun for ten minutes and then repeats itself. It has no goals, no progression and no reason to come back tomorrow.",
+      build:
+        "A Flutter rebuild with a clean game engine (moves, merge rules, spawning) and several modes on top: hand-designed stages, endless play, a daily challenge, tools, medals and unlockable skins, plus sound and saved progress.",
+      outcome:
+        "A complete mobile game with its own design language, where 2048 becomes a series of goals instead of one endless grind.",
     },
   },
   {

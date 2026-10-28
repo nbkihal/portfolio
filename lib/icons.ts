@@ -1,6 +1,7 @@
 import {
   Briefcase,
   CalendarDays,
+  Clock,
   Code2,
   Flag,
   Github,
@@ -11,6 +12,7 @@ import {
   Palette,
   Rocket,
   Sparkles,
+  Stethoscope,
   Users,
   Workflow,
   type LucideIcon,
@@ -37,4 +39,6 @@ export const icons: Record<IconKey, LucideIcon> = {
   flag: Flag,
   rocket: Rocket,
   briefcase: Briefcase,
+  medical: Stethoscope,
+  clock: Clock,
 };
