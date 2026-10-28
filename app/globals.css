@@ -91,6 +91,17 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* Hide the native cursor while the glowing custom cursor is active,
+     but keep the text caret in form fields. */
+  .has-custom-cursor,
+  .has-custom-cursor * {
+    cursor: none !important;
+  }
+  .has-custom-cursor input,
+  .has-custom-cursor textarea {
+    cursor: text !important;
+  }
+
   ::selection {
     @apply bg-brand/30 text-foreground;
   }
@@ -127,5 +138,33 @@
 
   .glow-brand {
     box-shadow: 0 0 40px -10px hsl(var(--brand) / 0.5);
+  }
+
+  /* Masks an element down to a 1px ring so its background reads as a
+     glowing border (used for the lit project-card edges). */
+  .border-mask {
+    padding: 1px;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .animate-border-spin {
+    animation: border-spin 6s linear infinite;
+  }
+}
+
+/* Animatable angle for the rotating conic light around featured cards. */
+@property --border-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes border-spin {
+  to {
+    --border-angle: 360deg;
   }
 }

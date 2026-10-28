@@ -1,7 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useReducedMotion,
+  useSpring,
+} from "framer-motion";
 import { ArrowUpRight, Github, Maximize2, X } from "lucide-react";
 
 import { projects, type Project, type ProjectSize } from "@/content/site-data";
@@ -17,6 +22,7 @@ const sizeClasses: Record<ProjectSize, string> = {
 
 export function Projects() {
   const [selected, setSelected] = React.useState<Project | null>(null);
+  const reduceMotion = useReducedMotion();
 
   // Escape to close + lock body scroll while the case study is open.
   React.useEffect(() => {
@@ -33,8 +39,30 @@ export function Projects() {
   }, [selected]);
 
   return (
-    <Section id="projects">
-      <div className="container">
+    <Section id="projects" className="relative overflow-hidden">
+      {/* Slowly drifting ambient light behind the grid */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <motion.div
+          className="absolute left-[5%] top-[20%] size-[26rem] rounded-full bg-brand/20 blur-[110px] dark:bg-brand/25"
+          animate={
+            reduceMotion
+              ? undefined
+              : { x: [0, 120, -40, 0], y: [0, -60, 80, 0] }
+          }
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-[5%] right-[5%] size-[22rem] rounded-full bg-cyan/15 blur-[110px] dark:bg-cyan/20"
+          animate={
+            reduceMotion
+              ? undefined
+              : { x: [0, -100, 60, 0], y: [0, 60, -50, 0] }
+          }
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+
+      <div className="container relative">
         <SectionHeading
           eyebrow="Selected Work"
           title="Things I've shipped"
@@ -82,11 +110,81 @@ function ProjectCard({
   onOpen: () => void;
 }) {
   const featured = project.size === "lg";
+  const reduceMotion = useReducedMotion();
+  const ref = React.useRef<HTMLDivElement>(null);
+  const rotateX = useSpring(0, { stiffness: 180, damping: 18 });
+  const rotateY = useSpring(0, { stiffness: 180, damping: 18 });
+
+  // Feed the pointer position to the lighting layers via CSS variables
+  // (no re-render) and tilt the card toward the pointer.
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const px = e.clientX - rect.left;
+    const py = e.clientY - rect.top;
+    el.style.setProperty("--mx", `${px}px`);
+    el.style.setProperty("--my", `${py}px`);
+
+    if (reduceMotion || e.pointerType !== "mouse") return;
+    const maxTilt = featured ? 3 : 6;
+    rotateY.set((px / rect.width - 0.5) * maxTilt * 2);
+    rotateX.set(-(py / rect.height - 0.5) * maxTilt * 2);
+  };
+
+  const onPointerLeave = () => {
+    rotateX.set(0);
+    rotateY.set(0);
+  };
 
   return (
-    <div className="group relative flex h-full min-h-[15rem] flex-col overflow-hidden rounded-xl border bg-card p-6 transition-all hover:border-brand/50 hover:shadow-[0_0_40px_-12px_hsl(var(--brand)/0.4)]">
+    <motion.div
+      ref={ref}
+      onPointerMove={onPointerMove}
+      onPointerLeave={onPointerLeave}
+      style={{ rotateX, rotateY, transformPerspective: 1000 }}
+      className="group relative flex h-full min-h-[15rem] flex-col overflow-hidden rounded-xl border bg-card p-6 transition-shadow duration-500 [--mx:50%] [--my:0%] hover:shadow-[0_0_60px_-12px_hsl(var(--brand)/0.55)]"
+    >
+      {/* Rotating beam of light around the edge of featured cards */}
+      {featured ? (
+        <span
+          aria-hidden
+          className="border-mask animate-border-spin pointer-events-none absolute inset-0 rounded-xl opacity-60 transition-opacity duration-500 group-hover:opacity-100"
+          style={{
+            background:
+              "conic-gradient(from var(--border-angle), transparent 55%, hsl(var(--brand)) 75%, hsl(var(--cyan)) 88%, transparent)",
+          }}
+        />
+      ) : null}
+
+      {/* Border that lights up under the pointer */}
+      <span
+        aria-hidden
+        className="border-mask pointer-events-none absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background:
+            "radial-gradient(260px circle at var(--mx) var(--my), hsl(var(--brand)), hsl(var(--cyan) / 0.6) 40%, transparent 70%)",
+        }}
+      />
+
+      {/* Spotlight on the card surface */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          background:
+            "radial-gradient(420px circle at var(--mx) var(--my), hsl(var(--brand) / 0.16), hsl(var(--cyan) / 0.05) 40%, transparent 65%)",
+        }}
+      />
+
+      {/* Diagonal shine that sweeps across on hover */}
+      <span
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 -translate-x-full -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-1000 ease-out group-hover:translate-x-[550%]"
+      />
+
       {/* Decorative index number */}
-      <span className="pointer-events-none absolute -right-3 -top-6 font-display text-8xl font-bold text-foreground/[0.04] transition-colors group-hover:text-brand/10">
+      <span className="pointer-events-none absolute -right-3 -top-6 font-display text-8xl font-bold text-foreground/[0.04] transition-all duration-500 group-hover:text-brand/20 group-hover:drop-shadow-[0_0_24px_hsl(var(--brand)/0.6)]">
         {String(index + 1).padStart(2, "0")}
       </span>
 
@@ -142,7 +240,7 @@ function ProjectCard({
         aria-label={`View case study: ${project.title}`}
         className="absolute inset-0 z-10 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       />
-    </div>
+    </motion.div>
   );
 }
 
@@ -184,8 +282,17 @@ function CaseStudyModal({
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 24, scale: 0.98 }}
         transition={{ duration: 0.25, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="relative w-full max-w-2xl rounded-t-2xl border bg-card p-6 shadow-2xl sm:rounded-2xl sm:p-8"
+        className="relative isolate w-full max-w-2xl overflow-hidden rounded-t-2xl border bg-card p-6 shadow-[0_0_80px_-20px_hsl(var(--brand)/0.5)] sm:rounded-2xl sm:p-8"
       >
+        {/* Light washing down from the top edge */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent"
+        />
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -top-24 left-1/2 -z-10 h-48 w-3/4 -translate-x-1/2 rounded-full bg-brand/20 blur-3xl"
+        />
         <button
           ref={closeRef}
           type="button"
