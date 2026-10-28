@@ -6,7 +6,7 @@ import { site } from "@/content/site-data";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
-import { FlameCursor } from "@/components/flame-cursor";
+import { LightBladeCursor } from "@/components/light-blade-cursor";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -81,7 +81,7 @@ export default function RootLayout({
           <Navbar />
           <main>{children}</main>
           <Footer />
-          <FlameCursor />
+          <LightBladeCursor />
         </ThemeProvider>
       </body>
     </html>
