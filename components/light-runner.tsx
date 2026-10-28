@@ -1,11 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { X } from "lucide-react";
+import { Volume2, VolumeX, X } from "lucide-react";
 
 /*
  * Light Runner — an original endless runner drawn in light. The player is a glowing
- * orb; neon palms grow from the ground and line-art flying dinos swoop at
+ * orb; neon cacti grow from the ground and line-art flying dinos swoop at
  * three heights. Jump: Space / ↑ / click / tap. Duck: ↓ / swipe down.
  * Escape exits.
  */
@@ -13,14 +13,14 @@ import { X } from "lucide-react";
 type Phase = "ready" | "running" | "over";
 
 interface Obstacle {
-  kind: "palm" | "dino";
+  kind: "cactus" | "dino";
   x: number;
-  /** Top edge (dinos) — palms are anchored to the ground. */
+  /** Top edge (dinos) — cacti are anchored to the ground. */
   y: number;
   w: number;
   h: number;
-  /** Heights of each palm in a cluster. */
-  palms: number[];
+  /** Heights of each cactus in a cluster. */
+  cacti: number[];
   seed: number;
 }
 
@@ -41,6 +41,7 @@ interface Box {
 }
 
 const BEST_KEY = "light-runner-best";
+const MUTE_KEY = "light-runner-muted";
 const MILESTONE = 500;
 
 function readBest() {
@@ -57,6 +58,82 @@ function writeBest(value: number) {
   } catch {
     /* storage unavailable — best score just won't persist */
   }
+}
+
+/**
+ * Tiny synthesizer for the game's sound effects (Web Audio, no files).
+ * The audio context is created lazily on the first sound, which always
+ * follows a key press or tap, so browsers allow it.
+ */
+function createSfx() {
+  let ac: AudioContext | null = null;
+  const audio = () => {
+    if (!ac) {
+      const AC =
+        window.AudioContext ??
+        (window as unknown as { webkitAudioContext?: typeof AudioContext })
+          .webkitAudioContext;
+      ac = AC ? new AC() : null;
+    }
+    if (ac?.state === "suspended") void ac.resume();
+    return ac;
+  };
+
+  const tone = (
+    from: number,
+    to: number,
+    duration: number,
+    type: OscillatorType,
+    volume: number,
+    delay = 0,
+  ) => {
+    const a = audio();
+    if (!a) return;
+    const t = a.currentTime + delay;
+    const osc = a.createOscillator();
+    const gain = a.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(from, t);
+    osc.frequency.exponentialRampToValueAtTime(to, t + duration);
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(volume, t + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    osc.connect(gain).connect(a.destination);
+    osc.start(t);
+    osc.stop(t + duration + 0.02);
+  };
+
+  const noise = (duration: number, volume: number) => {
+    const a = audio();
+    if (!a) return;
+    const buffer = a.createBuffer(1, a.sampleRate * duration, a.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < data.length; i++) {
+      data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
+    }
+    const src = a.createBufferSource();
+    const filter = a.createBiquadFilter();
+    const gain = a.createGain();
+    src.buffer = buffer;
+    filter.type = "lowpass";
+    filter.frequency.value = 900;
+    gain.gain.value = volume;
+    src.connect(filter).connect(gain).connect(a.destination);
+    src.start();
+  };
+
+  return {
+    jump: () => tone(330, 820, 0.14, "triangle", 0.14),
+    milestone: () => {
+      tone(784, 784, 0.1, "sine", 0.12);
+      tone(1175, 1175, 0.16, "sine", 0.12, 0.09);
+    },
+    crash: () => {
+      noise(0.4, 0.35);
+      tone(260, 45, 0.5, "sawtooth", 0.07);
+    },
+    close: () => void ac?.close(),
+  };
 }
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a);
@@ -76,10 +153,33 @@ export function LightRunner({
   const [phase, setPhase] = React.useState<Phase>("ready");
   const [finalScore, setFinalScore] = React.useState(0);
   const [best, setBest] = React.useState(0);
+  const [muted, setMuted] = React.useState(false);
+  const mutedRef = React.useRef(false);
+  mutedRef.current = muted;
   const onExitRef = React.useRef(onExit);
   onExitRef.current = onExit;
 
-  React.useEffect(() => setBest(readBest()), []);
+  React.useEffect(() => {
+    setBest(readBest());
+    try {
+      setMuted(localStorage.getItem(MUTE_KEY) === "1");
+    } catch {
+      /* default: sound on */
+    }
+  }, []);
+
+  const toggleMute = React.useCallback(() => {
+    setMuted((m) => {
+      try {
+        localStorage.setItem(MUTE_KEY, m ? "0" : "1");
+      } catch {
+        /* preference just won't persist */
+      }
+      return !m;
+    });
+  }, []);
+  const toggleMuteRef = React.useRef(toggleMute);
+  toggleMuteRef.current = toggleMute;
 
   React.useEffect(() => {
     const wrap = wrapRef.current;
@@ -88,8 +188,22 @@ export function LightRunner({
     if (!wrap || !canvas || !ctx) return;
 
     const C = dark
-      ? { a: "#8b5cf6", b: "#22d3ee", core: "#ffffff", soft: "#c4b5fd" }
-      : { a: "#6d28d9", b: "#0891b2", core: "#ffffff", soft: "#7c3aed" };
+      ? {
+          a: "#8b5cf6",
+          b: "#22d3ee",
+          core: "#ffffff",
+          soft: "#c4b5fd",
+          bg: "#0c0911",
+          tint: "rgba(34,211,238,0.14)",
+        }
+      : {
+          a: "#6d28d9",
+          b: "#0891b2",
+          core: "#ffffff",
+          soft: "#7c3aed",
+          bg: "#ffffff",
+          tint: "rgba(8,145,178,0.12)",
+        };
 
     // Geometry, recomputed on resize. `u` is the size unit everything
     // scales from, so the game feels the same on phones and desktops.
@@ -153,6 +267,11 @@ export function LightRunner({
       g.duckUntil = 0;
     };
 
+    const sfx = createSfx();
+    const play = (name: "jump" | "milestone" | "crash") => {
+      if (!mutedRef.current) sfx[name]();
+    };
+
     const setGamePhase = (next: Phase) => {
       g.phase = next;
       setPhase(next);
@@ -186,6 +305,7 @@ export function LightRunner({
       }
       if (g.py <= 0.5) {
         g.vy = u * 1.32;
+        play("jump");
         burst(px, ground, 8, u * 0.25);
       } else {
         g.jumpBufferedAt = g.t;
@@ -200,6 +320,10 @@ export function LightRunner({
       if (tag === "INPUT" || tag === "TEXTAREA") return;
       if (e.code === "Escape") {
         onExitRef.current();
+        return;
+      }
+      if (e.code === "KeyM") {
+        toggleMuteRef.current();
         return;
       }
       if (["Space", "ArrowUp", "KeyW"].includes(e.code)) {
@@ -262,7 +386,7 @@ export function LightRunner({
           y: altitude,
           w,
           h,
-          palms: [],
+          cacti: [],
           seed: Math.random() * 10,
         });
       } else {
@@ -272,17 +396,17 @@ export function LightRunner({
             : Math.random() < 0.4
               ? 2
               : 1;
-        const palmW = u * 0.05;
-        const palms = Array.from({ length: count }, () =>
+        const cactusW = u * 0.055;
+        const cacti = Array.from({ length: count }, () =>
           rand(u * 0.1, u * 0.16),
         );
         g.obstacles.push({
-          kind: "palm",
+          kind: "cactus",
           x: W + 20,
-          y: ground - Math.max(...palms),
-          w: palmW * count,
-          h: Math.max(...palms),
-          palms,
+          y: ground - Math.max(...cacti),
+          w: cactusW * count,
+          h: Math.max(...cacti),
+          cacti,
           seed: Math.random() * 10,
         });
       }
@@ -299,11 +423,11 @@ export function LightRunner({
           },
         ];
       }
-      const pw = o.w / o.palms.length;
-      return o.palms.map((h, i) => ({
-        x: o.x + i * pw + pw * 0.2,
+      const pw = o.w / o.cacti.length;
+      return o.cacti.map((h, i) => ({
+        x: o.x + i * pw + pw * 0.14,
         y: ground - h + h * 0.08,
-        w: pw * 0.6,
+        w: pw * 0.72,
         h: h * 0.92,
       }));
     };
@@ -329,56 +453,57 @@ export function LightRunner({
       ctx.shadowBlur = blur;
     };
 
-    const drawPalm = (x: number, h: number, w: number, sway: number) => {
-      const baseX = x + w / 2;
-      const topX = baseX + w * 0.28 + sway;
-      const topY = ground - h;
+    // Neon saguaro: a glowing outline traced around a trunk and up to two
+    // arms, filled with a faint tint, plus a rib down the middle.
+    const drawCactus = (x: number, h: number, w: number, seed: number) => {
+      const cx = x + w / 2;
+      const tw = w * 0.34;
+      const armW = tw * 0.72;
+      const top = ground - h;
+      const lw = Math.max(2, u * 0.005);
+      const trunk = new Path2D();
+      trunk.moveTo(cx, ground - tw / 2);
+      trunk.lineTo(cx, top + tw / 2);
+      const arms = new Path2D();
+      if (Math.sin(seed * 3.1) > -0.5) {
+        const ly = ground - h * (0.38 + ((seed * 7) % 1) * 0.12);
+        arms.moveTo(cx, ly);
+        arms.lineTo(cx - w * 0.36, ly);
+        arms.lineTo(cx - w * 0.36, ly - h * 0.24);
+      }
+      if (Math.cos(seed * 2.3) > -0.3) {
+        const ry = ground - h * (0.52 + ((seed * 5) % 1) * 0.12);
+        arms.moveTo(cx, ry);
+        arms.lineTo(cx + w * 0.36, ry);
+        arms.lineTo(cx + w * 0.36, ry - h * 0.2);
+      }
       ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      // Outline
       ctx.strokeStyle = C.b;
-      glow(C.b, 12);
-      ctx.lineWidth = Math.max(2, u * 0.007);
+      glow(C.b, 14);
+      ctx.lineWidth = tw + lw * 2;
+      ctx.stroke(trunk);
+      ctx.lineWidth = armW + lw * 2;
+      ctx.stroke(arms);
+      ctx.shadowBlur = 0;
+      // Hollow it out, then tint
+      for (const color of [C.bg, C.tint]) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = tw;
+        ctx.stroke(trunk);
+        ctx.lineWidth = armW;
+        ctx.stroke(arms);
+      }
+      // Rib
+      ctx.globalAlpha = 0.6;
+      ctx.strokeStyle = C.b;
+      ctx.lineWidth = Math.max(1, u * 0.0025);
       ctx.beginPath();
-      ctx.moveTo(baseX, ground);
-      ctx.quadraticCurveTo(baseX - w * 0.15, ground - h * 0.5, topX, topY);
+      ctx.moveTo(cx, ground - tw * 0.6);
+      ctx.lineTo(cx, top + tw * 0.6);
       ctx.stroke();
-      // Trunk rings
-      ctx.lineWidth = Math.max(1, u * 0.003);
-      for (let i = 1; i < 5; i++) {
-        const t = i / 5;
-        const tx =
-          (1 - t) * (1 - t) * baseX +
-          2 * (1 - t) * t * (baseX - w * 0.15) +
-          t * t * topX;
-        const ty = ground - h * t;
-        ctx.beginPath();
-        ctx.moveTo(tx - w * 0.12, ty);
-        ctx.lineTo(tx + w * 0.12, ty + h * 0.02);
-        ctx.stroke();
-      }
-      // Fronds
-      ctx.strokeStyle = C.a;
-      glow(C.a, 14);
-      ctx.lineWidth = Math.max(2, u * 0.006);
-      const fronds = [-168, -140, -110, -70, -40, -12];
-      for (const deg of fronds) {
-        const a = ((deg + sway * 2) * Math.PI) / 180;
-        const len = w * 1.15;
-        const ex = topX + Math.cos(a) * len;
-        const ey = topY + Math.sin(a) * len * 0.6 + len * 0.45;
-        ctx.beginPath();
-        ctx.moveTo(topX, topY);
-        ctx.quadraticCurveTo(
-          topX + Math.cos(a) * len * 0.6,
-          topY + Math.sin(a) * len * 0.75,
-          ex,
-          ey,
-        );
-        ctx.stroke();
-      }
-      ctx.fillStyle = C.core;
-      ctx.beginPath();
-      ctx.arc(topX, topY, Math.max(2, u * 0.006), 0, Math.PI * 2);
-      ctx.fill();
+      ctx.globalAlpha = 1;
     };
 
     const drawDino = (o: Obstacle) => {
@@ -557,10 +682,10 @@ export function LightRunner({
 
       // Obstacles
       for (const o of g.obstacles) {
-        if (o.kind === "palm") {
-          const pw = o.w / o.palms.length;
-          o.palms.forEach((h, i) =>
-            drawPalm(o.x + i * pw, h, pw, Math.sin(g.t * 2 + o.seed + i) * 2),
+        if (o.kind === "cactus") {
+          const pw = o.w / o.cacti.length;
+          o.cacti.forEach((h, i) =>
+            drawCactus(o.x + i * pw, h, pw, o.seed + i),
           );
         } else {
           drawDino(o);
@@ -619,6 +744,7 @@ export function LightRunner({
 
       if (g.score - g.lastMilestone >= MILESTONE) {
         g.lastMilestone = g.score - (g.score % MILESTONE);
+        play("milestone");
         scoreRef.current?.animate(
           [
             { transform: "scale(1.35)", filter: "brightness(2)" },
@@ -639,7 +765,10 @@ export function LightRunner({
           g.vy = 0;
           burst(px, ground, 6, u * 0.2);
           // A press just before landing still counts.
-          if (g.t - g.jumpBufferedAt < 0.12) g.vy = u * 1.32;
+          if (g.t - g.jumpBufferedAt < 0.12) {
+            g.vy = u * 1.32;
+            play("jump");
+          }
         }
       }
 
@@ -657,6 +786,7 @@ export function LightRunner({
       for (const o of g.obstacles) {
         if (hitboxes(o).some((b) => overlaps(pb, b))) {
           burst(px, pb.y + pb.h / 2, 60, u * 0.9);
+          play("crash");
           g.overAt = g.t;
           const newBest = Math.max(readBest(), g.score);
           writeBest(newBest);
@@ -712,6 +842,7 @@ export function LightRunner({
 
     return () => {
       stop();
+      sfx.close();
       ro.disconnect();
       io.disconnect();
       window.removeEventListener("keydown", onKeyDown);
@@ -729,6 +860,21 @@ export function LightRunner({
       className="absolute inset-0 z-10 touch-none select-none"
     >
       <canvas ref={canvasRef} className="h-full w-full" />
+
+      <button
+        type="button"
+        onClick={toggleMute}
+        aria-pressed={muted}
+        aria-label={muted ? "Turn sound on" : "Turn sound off"}
+        title="Sound (M)"
+        className="absolute left-6 top-36 inline-flex size-9 items-center justify-center rounded-full border bg-background/60 text-muted-foreground backdrop-blur transition-colors hover:border-brand hover:text-foreground md:left-10"
+      >
+        {muted ? (
+          <VolumeX className="size-4" />
+        ) : (
+          <Volume2 className="size-4" />
+        )}
+      </button>
 
       {/* HUD */}
       <div className="pointer-events-none absolute right-6 top-24 flex items-baseline gap-5 font-mono text-sm tabular-nums md:right-10">
@@ -760,7 +906,7 @@ export function LightRunner({
                 Light Runner
               </p>
               <p className="text-sm text-muted-foreground md:text-base">
-                Jump over the palms, dodge the flying dinos.
+                Jump over the cacti, dodge the flying dinos.
               </p>
             </>
           ) : (
