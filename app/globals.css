@@ -155,9 +155,20 @@
     animation: border-spin 6s linear infinite;
   }
 
+  /* Endless scroll for the tech-logo strip (content is rendered twice). */
+  .animate-marquee {
+    animation: marquee 45s linear infinite;
+  }
+
   /* Light band that sweeps down the hero portrait every few seconds. */
   .animate-scan {
     animation: scan 5s ease-in-out infinite;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
   }
 }
 
