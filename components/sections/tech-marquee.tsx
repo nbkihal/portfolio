@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 import { techStack } from "@/content/site-data";
 import { techIcons, type TechName } from "@/lib/tech-icons";
 
@@ -45,12 +47,11 @@ function TechItem({ name }: { name: TechName }) {
   return (
     <li
       className="group flex items-center gap-3 px-7 text-muted-foreground/70 transition-colors duration-300 hover:text-[color:var(--tech)]"
-      style={{ "--tech": hover } as React.CSSProperties}
+      style={{ "--tech": hover } as CSSProperties}
     >
       <svg
-        role="img"
+        aria-hidden
         viewBox="0 0 24 24"
-        aria-label={icon.title}
         className="size-8 fill-current transition-[transform,filter] duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_12px_var(--tech)]"
       >
         <path d={icon.path} />

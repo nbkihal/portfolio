@@ -68,7 +68,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
       <header className="container relative pb-16 pt-32 md:pb-20 md:pt-40">
         <Reveal>
           <Link
-            href="/#projects"
+            href="/projects"
             className="group mb-10 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-1" />

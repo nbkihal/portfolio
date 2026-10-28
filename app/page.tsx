@@ -1,5 +1,6 @@
 import { Intro } from "@/components/sections/intro";
 import { Hero } from "@/components/sections/hero";
+import { TechMarquee } from "@/components/sections/tech-marquee";
 import { About } from "@/components/sections/about";
 import { Parcours } from "@/components/sections/parcours";
 import { Services } from "@/components/sections/services";
@@ -12,6 +13,7 @@ export default function Home() {
     <>
       <Intro />
       <Hero />
+      <TechMarquee />
       <About />
       <Parcours />
       <Services />

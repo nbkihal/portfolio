@@ -10,6 +10,8 @@
  * ─────────────────────────────────────────────────────────────────────────
  */
 
+import type { TechName } from "@/lib/tech-icons";
+
 /* ------------------------------------------------------------------ types */
 
 export type IconKey =
@@ -47,6 +49,10 @@ export interface Service {
   cta: CTA;
 }
 
+/** Filters on the /projects page. */
+export type ProjectCategory =
+  "Web" | "Mobile" | "AI" | "Games" | "Client & pro";
+
 /** How prominently a project card renders in the bento grid. */
 export type ProjectSize = "lg" | "md";
 
@@ -59,6 +65,7 @@ export interface Project {
   githubUrl?: string;
   liveUrl?: string;
   size: ProjectSize;
+  categories: ProjectCategory[];
   /** Expanded case-study view: problem → build → outcome. */
   caseStudy: {
     problem: string;
@@ -301,6 +308,36 @@ export const parcours: Milestone[] = [
   },
 ];
 
+/* ------------------------------------------------------------- tech stack */
+/* Logos in the scrolling strip under the hero — see lib/tech-icons.ts.     */
+
+export const techStack: TechName[] = [
+  "Next.js",
+  "React",
+  "TypeScript",
+  "JavaScript",
+  "Node.js",
+  "Python",
+  "Django",
+  "Flutter",
+  "Dart",
+  "Tailwind CSS",
+  "Three.js",
+  "HTML5",
+  "CSS",
+  "Firebase",
+  "Supabase",
+  "Docker",
+  "LangChain",
+  "Gemini",
+  "Claude",
+  "Git",
+  "GitHub",
+  "Vite",
+  "Vitest",
+  "Vercel",
+];
+
 /* ---------------------------------------------------------------- services */
 
 export const services: Service[] = [
@@ -332,6 +369,9 @@ export const services: Service[] = [
 
 /* ---------------------------------------------------------------- projects */
 /* Order = visual impact. `size: "lg"` cards take extra width in the grid.   */
+/* The home page shows the first `featuredProjectCount`; /projects shows all. */
+
+export const featuredProjectCount = 5;
 
 export const projects: Project[] = [
   {
@@ -341,6 +381,7 @@ export const projects: Project[] = [
       "Secure rebuild of WeCheckin, a multi-company HR attendance platform in production — employee app on web, Android and iOS, plus HR and SaaS admin consoles.",
     tech: ["JavaScript", "Firebase", "Vite", "PWA", "Vitest"],
     size: "lg",
+    categories: ["Web", "Mobile", "Client & pro"],
     caseStudy: {
       problem:
         "A production HR app that companies rely on every day for clock-ins, schedules, overtime and payroll had grown hard to maintain and needed hardening — without any downtime for its users.",
@@ -358,6 +399,7 @@ export const projects: Project[] = [
     tech: ["Python", "LangChain", "Google Gemini API", "AST"],
     githubUrl: "https://github.com/Erraid7/Refactoring-Swarm-Equipe-24",
     size: "md",
+    categories: ["AI"],
     caseStudy: {
       problem:
         "Refactoring legacy Python is tedious and risky — it needs auditing, safe edits, tests, and docs, usually spread across several people.",
@@ -375,6 +417,7 @@ export const projects: Project[] = [
     tech: ["Flutter", "Dart"],
     githubUrl: "https://github.com/nbkihal/Logic",
     size: "md",
+    categories: ["Mobile", "Games"],
     caseStudy: {
       problem:
         "Digital logic is usually taught with static diagrams. Students learn faster when they can build circuits themselves and see them work or fail right away.",
@@ -391,6 +434,7 @@ export const projects: Project[] = [
       "Internship front-end that rebuilds medical documents from API data — text, tables, images and shapes — and generates the final PDF on demand for web and mobile.",
     tech: ["React", "TypeScript", "pdf-lib", "Tailwind CSS", "Vitest"],
     size: "md",
+    categories: ["Web", "Client & pro"],
     caseStudy: {
       problem:
         "A digital medical platform extracts and translates documents through separate services. Someone has to turn that structured data back into a faithful, readable document.",
@@ -408,6 +452,7 @@ export const projects: Project[] = [
     tech: ["HTML", "CSS", "JavaScript", "Supabase"],
     liveUrl: "https://mosque-registration-portail.vercel.app",
     size: "md",
+    categories: ["Web", "Client & pro"],
     caseStudy: {
       problem:
         "A mosque's Quranic school was handling registrations on paper and needed a simple, trustworthy way for families to sign up online, in Arabic.",
@@ -425,6 +470,7 @@ export const projects: Project[] = [
     tech: ["Django", "Python", "JavaScript", "Docker"],
     githubUrl: "https://github.com/Dali-MDB/Traveleo",
     size: "lg",
+    categories: ["Web"],
     caseStudy: {
       problem:
         "A travel agency needs more than a brochure site — it needs real data models, working flows, and a deployment story a team can actually run.",
@@ -441,6 +487,7 @@ export const projects: Project[] = [
       "Commercial-ready static site that uses the Anthropic API to generate tailored CVs, localized for the French/Algerian market with DZD pricing.",
     tech: ["HTML", "CSS", "JavaScript", "Anthropic API"],
     size: "md",
+    categories: ["Web", "AI"],
     caseStudy: {
       problem:
         "Job seekers in the French/Algerian market need CVs tailored per application — fast, localized, and priced for the local market.",
@@ -458,6 +505,7 @@ export const projects: Project[] = [
     tech: ["Flutter", "Dart"],
     githubUrl: "https://github.com/nbkihal/2048-game",
     size: "md",
+    categories: ["Mobile", "Games"],
     caseStudy: {
       problem:
         "Classic 2048 is fun for ten minutes and then repeats itself. It has no goals, no progression and no reason to come back tomorrow.",
@@ -474,6 +522,7 @@ export const projects: Project[] = [
       "Self-contained Three.js globe with real textures, city markers, and touch/zoom controls — the same engine powering this site's hero.",
     tech: ["Three.js", "WebGL"],
     size: "md",
+    categories: ["Web"],
     caseStudy: {
       problem:
         "3D on the web is often heavy and fragile — a globe needs to look real, run smoothly, and handle touch without a mountain of dependencies.",
@@ -490,6 +539,7 @@ export const projects: Project[] = [
       "SVG organizational charts generated for a real Algerian digital-solutions company's formal tender documents.",
     tech: ["SVG", "Data Visualization"],
     size: "md",
+    categories: ["Client & pro"],
     caseStudy: {
       problem:
         "Formal tender documents demand clean, precise org charts — the kind you can't fake with a screenshot of a slide.",
