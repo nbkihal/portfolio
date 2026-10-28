@@ -13,25 +13,25 @@ const STEPS = 24;
 
 /*
  * Flame temperature ramp, hottest first. Each particle walks down this
- * ramp over its life: white-hot core → ice cyan → blue → violet → gone.
+ * ramp over its life: soft warm core → orange → red → deep crimson → gone.
  */
 const RAMP_DARK = [
-  [240, 252, 255],
-  [170, 240, 255],
-  [64, 220, 245],
-  [34, 160, 240],
-  [70, 100, 240],
-  [124, 80, 235],
-  [90, 50, 170],
+  [255, 196, 150],
+  [255, 140, 70],
+  [245, 85, 40],
+  [220, 45, 30],
+  [175, 25, 25],
+  [120, 12, 20],
+  [70, 6, 14],
 ];
 const RAMP_LIGHT = [
-  [14, 165, 233],
-  [8, 145, 178],
-  [14, 116, 200],
-  [37, 99, 235],
-  [79, 70, 229],
-  [109, 40, 217],
-  [76, 29, 149],
+  [234, 88, 12],
+  [220, 38, 38],
+  [200, 30, 30],
+  [170, 25, 25],
+  [140, 22, 22],
+  [110, 18, 18],
+  [80, 10, 10],
 ];
 
 interface Particle {
@@ -61,8 +61,8 @@ function makeSprites(ramp: number[][], dark: boolean) {
     c.width = c.height = 64;
     const ctx = c.getContext("2d")!;
     const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    grad.addColorStop(0, `rgba(${r},${g},${b},${dark ? 0.9 : 0.5})`);
-    grad.addColorStop(0.3, `rgba(${r},${g},${b},${dark ? 0.45 : 0.32})`);
+    grad.addColorStop(0, `rgba(${r},${g},${b},${dark ? 0.7 : 0.45})`);
+    grad.addColorStop(0.3, `rgba(${r},${g},${b},${dark ? 0.32 : 0.28})`);
     grad.addColorStop(0.65, `rgba(${r},${g},${b},${dark ? 0.12 : 0.12})`);
     grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
     ctx.fillStyle = grad;
@@ -81,8 +81,8 @@ function turbulence(x: number, y: number, t: number) {
 }
 
 /**
- * Cold-fire cursor: a particle flame that burns at the pointer — white-hot
- * at the base, ice-blue in the body, violet at the tips — with flicker,
+ * Fire cursor: a particle flame that burns at the pointer — warm at the
+ * base, red in the body, deep crimson at the tips — with flicker,
  * turbulence, drift away from the direction of motion, and rising embers.
  * Flares over links and buttons; a click throws a burst of sparks. A
  * bright core marks the exact click point. Mouse/trackpad only, and off
@@ -260,7 +260,7 @@ export function FlameCursor() {
         const flicker = 0.85 + 0.15 * Math.sin(time * 24 + p.seed);
         const size = p.size * (1 - t * 0.8) * flicker;
         const sprite = sprites[Math.min(STEPS - 1, Math.floor(t * STEPS))];
-        ctx.globalAlpha = Math.pow(1 - t, 1.1) * (dark ? 0.75 : 0.55);
+        ctx.globalAlpha = Math.pow(1 - t, 1.1) * (dark ? 0.55 : 0.5);
         ctx.drawImage(sprite, p.x - size, p.y - size, size * 2, size * 2);
       }
       ctx.globalAlpha = 1;
@@ -275,23 +275,23 @@ export function FlameCursor() {
           0,
           pointer.x,
           pointer.y,
-          16 * pulse,
+          12 * pulse,
         );
         halo.addColorStop(
           0,
-          dark ? "rgba(235,250,255,0.95)" : "rgba(14,116,144,0.9)",
+          dark ? "rgba(255,200,170,0.7)" : "rgba(185,28,28,0.75)",
         );
         halo.addColorStop(
           0.35,
-          dark ? "rgba(90,210,255,0.55)" : "rgba(37,99,235,0.35)",
+          dark ? "rgba(239,68,68,0.35)" : "rgba(220,38,38,0.25)",
         );
-        halo.addColorStop(1, "rgba(60,120,255,0)");
+        halo.addColorStop(1, "rgba(180,20,20,0)");
         ctx.fillStyle = halo;
         ctx.beginPath();
-        ctx.arc(pointer.x, pointer.y, 16 * pulse, 0, Math.PI * 2);
+        ctx.arc(pointer.x, pointer.y, 12 * pulse, 0, Math.PI * 2);
         ctx.fill();
         ctx.globalCompositeOperation = "source-over";
-        ctx.fillStyle = dark ? "#ffffff" : "#0c4a6e";
+        ctx.fillStyle = dark ? "#ffe4dc" : "#7f1d1d";
         ctx.beginPath();
         ctx.arc(pointer.x, pointer.y, 2.2, 0, Math.PI * 2);
         ctx.fill();
