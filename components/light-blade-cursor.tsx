@@ -134,7 +134,7 @@ export function LightBladeCursor() {
 
       // Blade: each glow layer is stroked segment by segment so its width
       // can taper with the age of the trail.
-      const base = 6 + energy * 2.5;
+      const base = 6.5 + energy * 2.5;
       if (trail.length > 1) {
         const ramp = dark ? RAMP_DARK : RAMP_LIGHT;
         for (const [mult, darkAlpha, lightAlpha, core] of LAYERS) {
@@ -154,7 +154,7 @@ export function LightBladeCursor() {
               bl += (255 - bl) * w;
             }
             ctx.strokeStyle = `rgba(${r | 0},${g | 0},${bl | 0},${alpha})`;
-            ctx.lineWidth = Math.max(0.4, base * mult * Math.pow(life, 1.4));
+            ctx.lineWidth = Math.max(0.4, base * mult * Math.pow(life, 0.85));
             ctx.beginPath();
             ctx.moveTo((a.x + b.x) / 2, (a.y + b.y) / 2);
             ctx.quadraticCurveTo(b.x, b.y, (b.x + c.x) / 2, (b.y + c.y) / 2);
