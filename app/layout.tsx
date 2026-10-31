@@ -1,12 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 
+import "lenis/dist/lenis.css";
 import "./globals.css";
 import { site } from "@/content/site-data";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { LightBladeCursor } from "@/components/light-blade-cursor";
+import { SmoothScroll } from "@/components/smooth-scroll";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -82,6 +84,7 @@ export default function RootLayout({
           <main>{children}</main>
           <Footer />
           <LightBladeCursor />
+          <SmoothScroll />
         </ThemeProvider>
       </body>
     </html>

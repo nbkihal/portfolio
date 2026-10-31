@@ -86,6 +86,11 @@
     scroll-padding-top: 5rem;
   }
 
+  /* Lenis drives the smooth scrolling; native smoothing would fight it. */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
