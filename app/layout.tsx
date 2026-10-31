@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
 import { LightBladeCursor } from "@/components/light-blade-cursor";
+import { CursorLight } from "@/components/cursor-light";
 import { SmoothScroll } from "@/components/smooth-scroll";
 
 const inter = Inter({
@@ -83,6 +84,7 @@ export default function RootLayout({
           <Navbar />
           <main>{children}</main>
           <Footer />
+          <CursorLight />
           <LightBladeCursor />
           <SmoothScroll />
         </ThemeProvider>
