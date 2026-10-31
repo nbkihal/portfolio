@@ -115,6 +115,11 @@ export function Navbar() {
   const pathname = usePathname();
   const [active, choose] = useActiveSection(pathname === "/");
   const roomy = useMediaQuery("(min-width: 1024px)");
+  // Icons only at rest; the labels slide out while the pointer is over the
+  // pill or focus is inside it. Only where there is room for the wide pill.
+  const [hovered, setHovered] = React.useState(false);
+  const [focusWithin, setFocusWithin] = React.useState(false);
+  const expanded = roomy && (hovered || focusWithin);
 
   // The water is tinted for the background it sits on. Dark is the site
   // default, so render that on the server and settle after mount.
@@ -158,15 +163,26 @@ export function Navbar() {
           <span className="text-brand">.</span>
         </Link>
 
-        {/* Desktop links: a pill of water, centred. Icons only until there is room for labels. */}
-        <div className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block">
+        {/* Desktop links: a pill of water, centred. Icons at rest, labels on hover. */}
+        <div
+          className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block"
+          data-expanded={expanded || undefined}
+          onPointerEnter={() => setHovered(true)}
+          onPointerLeave={() => setHovered(false)}
+          onFocus={() => setFocusWithin(true)}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node | null))
+              setFocusWithin(false);
+          }}
+        >
           <LiquidNavbar
             items={ITEMS}
             active={active}
             onChange={choose}
             tone={tone}
-            compact={!roomy}
+            compact={false}
             frame={false}
+            className="nav-pill"
             style={{ fontFamily: "inherit" }}
           />
         </div>

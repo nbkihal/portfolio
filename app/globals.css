@@ -99,6 +99,43 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* Header pill: icons only at rest, labels slide out on hover/focus.
+     The negative margin cancels the item's icon–label gap while collapsed. */
+  .nav-pill .nimbus-item {
+    padding: 0 13px;
+    transition: padding 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.25s;
+  }
+  .nav-pill .nimbus-label {
+    display: inline-block;
+    max-width: 0;
+    margin-left: -8px;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition:
+      max-width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+      margin-left 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.2s ease;
+  }
+  [data-expanded] .nav-pill .nimbus-item {
+    padding: 0 16px;
+  }
+  [data-expanded] .nav-pill .nimbus-label {
+    max-width: 8rem;
+    margin-left: 0;
+    opacity: 1;
+    transition:
+      max-width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      margin-left 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.3s ease 0.1s;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav-pill .nimbus-item,
+    .nav-pill .nimbus-label {
+      transition: none;
+    }
+  }
+
   /* Hide the native cursor while the glowing custom cursor is active,
      but keep the text caret in form fields. */
   .has-custom-cursor,
