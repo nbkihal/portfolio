@@ -8,7 +8,7 @@ const INTERACTIVE =
   "a, button, [role='button'], input, textarea, select, label, summary";
 
 /** Radius of the whole body of light at rest, in px. */
-const RADIUS = 240;
+const RADIUS = 150;
 /** How heavily the body lags the pointer. Lower is heavier. */
 const FOLLOW = 5;
 /** Overlapping lobes that make up the body. More is softer and slower. */
@@ -118,7 +118,7 @@ export function CursorLight() {
       prev.x = core.x;
       prev.y = core.y;
       presence +=
-        ((pointer.inside ? 1 : 0) - presence) * (1 - Math.exp(-dt * 3));
+        ((pointer.inside ? 1 : 0) - presence) * (1 - Math.exp(-dt * 7));
       energy += ((pointer.hover ? 1 : 0) - energy) * (1 - Math.exp(-dt * 6));
 
       // Breathes slowly at rest, swells over clickable things.
@@ -129,7 +129,7 @@ export function CursorLight() {
       ctx.clearRect(0, 0, width, height);
       ctx.globalCompositeOperation = dark ? "lighter" : "source-over";
       const tints = dark ? TINTS_DARK : TINTS_LIGHT;
-      const alpha = (dark ? 0.17 : 0.075) * presence;
+      const alpha = (dark ? 0.11 : 0.055) * presence;
 
       lobes.forEach((lobe, i) => {
         const angle = lobe.phase + t * lobe.speed;
@@ -147,8 +147,10 @@ export function CursorLight() {
           R * lobe.size * (1 + 0.1 * Math.sin(t * 1.3 + i)) * (1 + stretch * 0.25);
         const [cr, cg, cb] = tints[i % tints.length];
         const glow = ctx.createRadialGradient(lobe.x, lobe.y, 0, lobe.x, lobe.y, r);
+        // holds its colour most of the way out, then drops off: a body, not a haze
         glow.addColorStop(0, `rgba(${cr},${cg},${cb},${alpha})`);
-        glow.addColorStop(0.45, `rgba(${cr},${cg},${cb},${alpha * 0.45})`);
+        glow.addColorStop(0.6, `rgba(${cr},${cg},${cb},${alpha * 0.8})`);
+        glow.addColorStop(0.85, `rgba(${cr},${cg},${cb},${alpha * 0.25})`);
         glow.addColorStop(1, `rgba(${cr},${cg},${cb},0)`);
         ctx.fillStyle = glow;
         ctx.beginPath();
@@ -159,7 +161,7 @@ export function CursorLight() {
       // A brighter heart, so the light reads as one body rather than a cloud.
       if (dark) {
         const heart = ctx.createRadialGradient(core.x, core.y, 0, core.x, core.y, R * 0.5);
-        heart.addColorStop(0, `rgba(235,240,255,${0.16 * presence})`);
+        heart.addColorStop(0, `rgba(235,240,255,${0.09 * presence})`);
         heart.addColorStop(1, "rgba(235,240,255,0)");
         ctx.fillStyle = heart;
         ctx.beginPath();
