@@ -118,8 +118,33 @@ export function Navbar() {
   // Icons only at rest; the labels slide out while the pointer is over the
   // pill or focus is inside it. Only where there is room for the wide pill.
   const [hovered, setHovered] = React.useState(false);
+  // Only keyboard focus (focus-visible) holds the pill open; a mouse click
+  // also focuses the link, and that must not pin it wide after the click.
   const [focusWithin, setFocusWithin] = React.useState(false);
   const expanded = roomy && (hovered || focusWithin);
+  // While hovering with no section active (the hero, other pages), the drop
+  // follows the item under the pointer instead of having nowhere to be.
+  const [hoverIndex, setHoverIndex] = React.useState(-1);
+  const shown = active >= 0 ? active : hovered ? hoverIndex : -1;
+
+  // The water shows while the pointer is on the pill, focus is inside it, or
+  // the page is scrolling (so the drop is seen moving between sections). It
+  // fades out once the page has been still for a moment.
+  const [scrolling, setScrolling] = React.useState(false);
+  React.useEffect(() => {
+    let timer = 0;
+    const onScroll = () => {
+      setScrolling(true);
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => setScrolling(false), 700);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+  const water = hovered || focusWithin || scrolling;
 
   // The water is tinted for the background it sits on. Dark is the site
   // default, so render that on the server and settle after mount.
@@ -167,9 +192,24 @@ export function Navbar() {
         <div
           className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 md:block"
           data-expanded={expanded || undefined}
+          data-water={water || undefined}
           onPointerEnter={() => setHovered(true)}
-          onPointerLeave={() => setHovered(false)}
-          onFocus={() => setFocusWithin(true)}
+          onPointerLeave={() => {
+            setHovered(false);
+            setHoverIndex(-1);
+          }}
+          onPointerMove={(e) => {
+            const item = (e.target as Element).closest(".nimbus-item");
+            if (!item) return;
+            const i = Array.from(
+              e.currentTarget.querySelectorAll(".nimbus-item"),
+            ).indexOf(item);
+            if (i !== hoverIndex) setHoverIndex(i);
+          }}
+          onFocus={(e) => {
+            if ((e.target as Element).matches(":focus-visible"))
+              setFocusWithin(true);
+          }}
           onBlur={(e) => {
             if (!e.currentTarget.contains(e.relatedTarget as Node | null))
               setFocusWithin(false);
@@ -177,7 +217,7 @@ export function Navbar() {
         >
           <LiquidNavbar
             items={ITEMS}
-            active={active}
+            active={shown}
             onChange={choose}
             tone={tone}
             compact={false}
