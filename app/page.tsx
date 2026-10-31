@@ -4,7 +4,7 @@ import { TechMarquee } from "@/components/sections/tech-marquee";
 import { About } from "@/components/sections/about";
 import { Parcours } from "@/components/sections/parcours";
 import { Services } from "@/components/sections/services";
-import { Projects } from "@/components/sections/projects";
+import { ArchiveFolders } from "@/components/sections/archive-folders";
 import { Testimonials } from "@/components/sections/testimonials";
 import { Contact } from "@/components/sections/contact";
 
@@ -17,7 +17,7 @@ export default function Home() {
       <About />
       <Parcours />
       <Services />
-      <Projects />
+      <ArchiveFolders />
       <Testimonials />
       <Contact />
     </>

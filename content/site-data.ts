@@ -392,10 +392,9 @@ export const services: Service[] = [
 ];
 
 /* ---------------------------------------------------------------- projects */
-/* Order = visual impact. `size: "lg"` cards take extra width in the grid.   */
-/* The home page shows the first `featuredProjectCount`; /projects shows all. */
-
-export const featuredProjectCount = 5;
+/* Order = visual impact: the home page's folders put the first project of   */
+/* each category nearest the glass. `size: "lg"` cards take extra width in   */
+/* the /projects grid.                                                        */
 
 export const projects: Project[] = [
   {

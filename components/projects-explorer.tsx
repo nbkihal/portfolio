@@ -25,6 +25,13 @@ const CATEGORIES: ProjectCategory[] = [
 export function ProjectsExplorer() {
   const [filter, setFilter] = React.useState<Filter>("All");
 
+  // `/projects#Web` opens the archive already filtered (the home page's
+  // folders link here). Read once on mount, so the page can stay static.
+  React.useEffect(() => {
+    const hash = decodeURIComponent(window.location.hash.slice(1));
+    if ((CATEGORIES as string[]).includes(hash)) setFilter(hash as Filter);
+  }, []);
+
   const count = (f: Filter) =>
     f === "All"
       ? projects.length
