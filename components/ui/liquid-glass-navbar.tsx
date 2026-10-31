@@ -460,7 +460,9 @@ export function LiquidNavbar({
     let lastW = -1
     const ro = new ResizeObserver(() => {
       const w = navRef.current?.offsetWidth ?? 0
-      if (w !== lastW) { lastW = w; st.current.ready = false; measureRef.current() }
+      // Re-measure as the pill changes width (e.g. labels sliding open). The
+      // drop keeps its physics and flows to the new spot rather than snapping.
+      if (w !== lastW) { lastW = w; measureRef.current() }
     })
     if (navRef.current) ro.observe(navRef.current)
     return () => ro.disconnect()
