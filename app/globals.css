@@ -4,32 +4,35 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 4%;
+    /* Light theme: not plain white, a soft lavender-grey cut from the brand
+       violet, so the page sits with the secondary colours instead of under them.
+       Cards stay near-white and lift off it. */
+    --background: 258 32% 94%;
+    --foreground: 258 24% 8%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 4%;
+    --card: 258 40% 99%;
+    --card-foreground: 258 24% 8%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 4%;
+    --popover: 258 40% 99%;
+    --popover-foreground: 258 24% 8%;
 
     --primary: 258 90% 58%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 6% 10%;
+    --secondary: 258 24% 89%;
+    --secondary-foreground: 258 20% 12%;
 
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 40%;
+    --muted: 258 22% 90%;
+    --muted-foreground: 258 10% 38%;
 
-    --accent: 240 5% 96%;
-    --accent-foreground: 240 6% 10%;
+    --accent: 258 26% 89%;
+    --accent-foreground: 258 20% 12%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
+    --border: 258 20% 82%;
+    --input: 258 20% 82%;
     --ring: 258 90% 58%;
 
     /* Bold brand accent + contrast secondary */
