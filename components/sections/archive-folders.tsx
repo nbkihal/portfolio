@@ -129,7 +129,10 @@ export function ArchiveFolders() {
     files: filesFor(category),
   })).filter((f) => f.files.length > 0);
 
-  // ---- the shelf: a horizontal snap scroller with arrows for mouse users ----
+  // ---- the shelf: a horizontal scroller --------------------------------------
+  // Three ways to move it besides a trackpad swipe: the arrows, a vertical
+  // mouse wheel over it (which turns sideways until the shelf runs out, then
+  // the page scrolls on as usual), and dragging it with the mouse.
   const shelfRef = React.useRef<HTMLDivElement>(null);
   const [edge, setEdge] = React.useState({ start: true, end: false });
   React.useEffect(() => {
@@ -143,16 +146,79 @@ export function ArchiveFolders() {
     el.addEventListener("scroll", measure, { passive: true });
     const ro = new ResizeObserver(measure);
     ro.observe(el);
+
+    // Vertical wheel → sideways. Handled here, before the event reaches the
+    // window, so Lenis never sees the ones the shelf consumes.
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) >= Math.abs(e.deltaY)) return; // already sideways
+      const max = el.scrollWidth - el.clientWidth;
+      const room = e.deltaY > 0 ? el.scrollLeft < max - 1 : el.scrollLeft > 1;
+      if (!room) return; // let the page take over at either end
+      e.preventDefault();
+      e.stopPropagation();
+      el.scrollLeft += e.deltaY;
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+
+    // Drag to scroll. A press that moves more than a few px becomes a drag
+    // and the click it would have been is swallowed, so a folder doesn't
+    // open at the end of a drag.
+    let drag: { x: number; left: number; moved: boolean } | null = null;
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      drag = { x: e.clientX, left: el.scrollLeft, moved: false };
+    };
+    const onMove = (e: PointerEvent) => {
+      if (!drag) return;
+      const dx = e.clientX - drag.x;
+      if (!drag.moved) {
+        if (Math.abs(dx) < 6) return;
+        drag.moved = true;
+        el.setPointerCapture(e.pointerId);
+        el.dataset.dragging = "true";
+      }
+      el.scrollLeft = drag.left - dx;
+    };
+    const onUp = (e: PointerEvent) => {
+      if (!drag) return;
+      if (drag.moved) {
+        el.releasePointerCapture(e.pointerId);
+        // let the click that follows this release be swallowed, then clear
+        setTimeout(() => delete el.dataset.dragging, 0);
+      }
+      drag = null;
+    };
+    const onClick = (e: MouseEvent) => {
+      if (el.dataset.dragging) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    el.addEventListener("pointerdown", onDown);
+    el.addEventListener("pointermove", onMove);
+    el.addEventListener("pointerup", onUp);
+    el.addEventListener("pointercancel", onUp);
+    el.addEventListener("click", onClick, true);
+
     return () => {
       el.removeEventListener("scroll", measure);
       ro.disconnect();
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("pointerdown", onDown);
+      el.removeEventListener("pointermove", onMove);
+      el.removeEventListener("pointerup", onUp);
+      el.removeEventListener("pointercancel", onUp);
+      el.removeEventListener("click", onClick, true);
     };
   }, []);
+  // The arrows go to the next folder position outright, so quick repeated
+  // presses don't drift off the grid.
   const shelfBy = (dir: -1 | 1) => {
     const el = shelfRef.current;
     if (!el) return;
     const step = FOLDER_WIDTH + SHELF_GAP;
-    el.scrollBy({ left: dir * step, behavior: "smooth" });
+    const at = Math.round(el.scrollLeft / step);
+    el.scrollTo({ left: (at + dir) * step, behavior: "smooth" });
   };
 
   return (
@@ -174,7 +240,7 @@ export function ArchiveFolders() {
           description="Client work, team products and experiments, filed by type. Open a folder and pick a file for the full story — problem, build, and outcome."
         />
 
-        <div className="-mt-6 mb-2 flex items-center justify-end gap-2">
+        <div className="relative z-10 -mt-6 mb-2 flex items-center justify-end gap-2">
           <button
             type="button"
             aria-label="Scroll folders left"
@@ -210,8 +276,8 @@ export function ArchiveFolders() {
         role="list"
         aria-label="Projects by category"
         className={cn(
-          "relative flex snap-x snap-mandatory items-end overflow-x-auto overscroll-x-contain",
-          "px-[max(1.5rem,calc((100%-1200px)/2+1.5rem))] scroll-px-[max(1.5rem,calc((100%-1200px)/2+1.5rem))]",
+          "relative flex items-end overflow-x-auto overscroll-x-contain select-none",
+          "px-[max(1.5rem,calc((100%-1200px)/2+1.5rem))]",
           "-mt-28 pb-16 pt-32",
           "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           "[mask-image:linear-gradient(to_right,transparent,black_1.5rem,black_calc(100%-1.5rem),transparent)]",
@@ -219,7 +285,7 @@ export function ArchiveFolders() {
         style={{ gap: SHELF_GAP }}
       >
         {folders.map(({ category, files }, i) => (
-          <div key={category} role="listitem" className="snap-start">
+          <div key={category} role="listitem">
             <GlassFolder
               label={category}
               meta={`${files.length} ${files.length === 1 ? "project" : "projects"}`}
