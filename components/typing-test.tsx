@@ -273,7 +273,7 @@ export function TypingTest({ onExit }: { onExit: () => void }) {
       initial={{ opacity: 0, scale: 0.97 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className="absolute inset-x-0 bottom-0 top-16 z-10 flex flex-col items-center overflow-y-auto overscroll-contain px-6 pb-10 pt-20"
+      className="absolute inset-x-0 bottom-0 top-16 z-10"
       onPointerDown={(e) => {
         if (!(e.target as Element).closest("button")) {
           e.preventDefault();
@@ -284,12 +284,12 @@ export function TypingTest({ onExit }: { onExit: () => void }) {
       <button
         type="button"
         onClick={onExit}
-        className="absolute left-6 top-8 inline-flex items-center gap-2 rounded-full border bg-background/60 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur transition-colors hover:border-brand hover:text-foreground md:left-10"
+        className="absolute left-6 top-8 z-20 inline-flex items-center gap-2 rounded-full border bg-background/60 px-3 py-1.5 text-xs font-medium text-muted-foreground backdrop-blur transition-colors hover:border-brand hover:text-foreground md:left-10"
       >
         <X className="size-3.5" />
         Exit <kbd className="font-mono text-[10px] opacity-60">Esc</kbd>
       </button>
-      <p className="absolute right-6 top-8 font-mono text-sm text-muted-foreground md:right-10">
+      <p className="absolute right-6 top-8 z-20 font-mono text-sm text-muted-foreground md:right-10">
         best <span className="text-foreground">{best}</span> wpm
       </p>
 
@@ -308,6 +308,9 @@ export function TypingTest({ onExit }: { onExit: () => void }) {
         className="absolute h-px w-px opacity-0"
       />
 
+      {/* The scrolling layer: content centres when it fits the screen and
+          scrolls under the pinned controls when it doesn't (phones). */}
+      <div className="absolute inset-0 flex flex-col items-center overflow-y-auto overscroll-contain px-6 pb-10 pt-20">
       {stats ? (
         <Results
           stats={stats}
@@ -438,6 +441,7 @@ export function TypingTest({ onExit }: { onExit: () => void }) {
           </div>
         </div>
       )}
+      </div>
     </motion.div>
   );
 }
