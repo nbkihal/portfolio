@@ -273,7 +273,7 @@ export function TypingTest({ onExit }: { onExit: () => void }) {
       initial={{ opacity: 0, scale: 0.97 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6"
+      className="absolute inset-0 z-10 flex flex-col items-center overflow-y-auto overscroll-contain px-6 pb-10 pt-36 sm:pt-32"
       onPointerDown={(e) => {
         if (!(e.target as Element).closest("button")) {
           e.preventDefault();
@@ -316,7 +316,7 @@ export function TypingTest({ onExit }: { onExit: () => void }) {
           onRepeat={() => restart(true)}
         />
       ) : (
-        <div className="w-full max-w-4xl">
+        <div className="my-auto w-full max-w-4xl">
           {/* Live stats */}
           <div className="mb-6 flex items-baseline gap-6 font-mono text-brand">
             <span className="text-3xl font-bold tabular-nums">
@@ -466,20 +466,20 @@ function Results({
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full max-w-3xl"
+      className="my-auto w-full max-w-3xl"
       aria-live="polite"
     >
-      <div className="grid gap-8 sm:grid-cols-[auto_1fr] sm:items-center">
-        <div className="flex gap-10 sm:flex-col sm:gap-4">
+      <div className="grid gap-5 sm:grid-cols-[auto_1fr] sm:items-center sm:gap-8">
+        <div className="flex gap-8 sm:flex-col sm:gap-4">
           <div>
             <p className="font-mono text-sm text-muted-foreground">wpm</p>
-            <p className="text-gradient font-display text-6xl font-bold leading-none md:text-7xl">
+            <p className="text-gradient font-display text-5xl font-bold leading-none sm:text-6xl md:text-7xl">
               {stats.wpm}
             </p>
           </div>
           <div>
             <p className="font-mono text-sm text-muted-foreground">acc</p>
-            <p className="font-display text-5xl font-bold leading-none text-foreground md:text-6xl">
+            <p className="font-display text-4xl font-bold leading-none text-foreground sm:text-5xl md:text-6xl">
               {stats.accuracy}%
             </p>
           </div>
@@ -488,7 +488,7 @@ function Results({
         <div className="rounded-xl border bg-card/60 p-4 backdrop-blur">
           <svg
             viewBox="0 0 100 42"
-            className="h-32 w-full overflow-visible"
+            className="h-24 w-full overflow-visible sm:h-32"
             preserveAspectRatio="none"
           >
             <defs>
@@ -524,7 +524,7 @@ function Results({
         </div>
       </div>
 
-      <dl className="mt-8 grid grid-cols-2 gap-4 font-mono sm:grid-cols-4">
+      <dl className="mt-6 grid grid-cols-2 gap-4 font-mono sm:mt-8 sm:grid-cols-4">
         {[
           ["raw", String(stats.raw)],
           ["time", `${stats.seconds.toFixed(1)}s`],
@@ -544,7 +544,7 @@ function Results({
         characters = correct / incorrect / extra / missed
       </p>
 
-      <div className="mt-8 flex flex-wrap gap-3">
+      <div className="mt-6 flex flex-wrap gap-3 sm:mt-8">
         <button
           type="button"
           onClick={onRestart}
